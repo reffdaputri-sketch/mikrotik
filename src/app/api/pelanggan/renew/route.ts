@@ -46,7 +46,15 @@ export async function POST(request: Request) {
     }
 
     const toyyibRes = await createToyyibpayBill({
-// ... (rest of toyyibPay logic)
+      billName: `Pembaharuan ${plan.name_plan}`,
+      billDescription: `Pembaharuan internet untuk ${customer.username}`,
+      billAmount: plan.price,
+      billTo: customer.fullname,
+      billEmail: customer.email || 'customer@nuxbill.com',
+      billPhone: customer.phonenumber,
+      externalReferenceNo: order.order_id,
+      returnUrl: `${appUrl}/pelanggan?status=pending`,
+      callbackUrl: `${appUrl}/api/webhook/toyyibpay`
     })
 
     if (!toyyibRes.success) {
