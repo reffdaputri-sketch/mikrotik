@@ -1,0 +1,16 @@
+{
+  "name": "nuxbill-mikrotik-agent",
+  "version": "1.0.0",
+  "description": "Local agent untuk NuxBill - eksekusi perintah ke MikroTik RouterOS API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "dotenv": "^16.4.5",
+    "node-routeros": "^1.5.11",
+    "ws": "^8.20.1"
+  }
+}
