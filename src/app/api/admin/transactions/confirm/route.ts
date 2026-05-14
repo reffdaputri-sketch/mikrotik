@@ -2,13 +2,11 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getSession } from '@/lib/session'
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: Request) {
   if (!await getSession()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   
-  const { id } = await params
+  const body = await request.json()
+  const { id } = body
   const supabase = await createAdminClient()
 
   try {
