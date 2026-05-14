@@ -15,7 +15,7 @@ async function getDashboardStats() {
     { count: totalVouchers },
     { data: transactions },
     { data: recentOrders },
-    { data: pendingCommands },
+    { count: totalPendingCommands },
   ] = await Promise.all([
     supabase.from('customers').select('*', { count: 'exact', head: true }),
     supabase.from('plans').select('*', { count: 'exact', head: true }).eq('enabled', true),
@@ -27,7 +27,7 @@ async function getDashboardStats() {
 
   const monthlyRevenue = transactions?.reduce((sum, t) => sum + parseFloat(t.price || '0'), 0) || 0
 
-  return { totalCustomers, totalPlans, totalVouchers, monthlyRevenue, recentOrders, pendingCommands: pendingCommands?.count || 0 }
+  return { totalCustomers, totalPlans, totalVouchers, monthlyRevenue, recentOrders, pendingCommands: totalPendingCommands || 0 }
 }
 
 export default async function DashboardPage() {
