@@ -6,20 +6,31 @@ export async function POST(request: Request) {
     const { username, password } = await request.json()
     const supabase = await createAdminClient()
 
-    // Cari pelanggan berdasarkan username & password
-    const { data: customer, error } = await supabase
+    // Cari pelanggan berdasarkan username
+    let query = supabase
       .from('customers')
       .select('*, plans(*, bandwidths(*)), payment_orders(*)')
       .eq('username', username)
-      .eq('password', password)
-      .single()
+
+    // Jika password diberikan, pastikan ia sepadan
+    if (password) {
+      query = query.eq('password', password)
+    }
+
+    const { data: customer, error } = await query.single()
 
     if (error || !customer) {
-      return NextResponse.json({ error: 'Username atau password salah' }, { status: 401 })
+      return NextResponse.json({ error: 'Username atau kata laluan tidak sah' }, { status: 401 })
+    }
+
+    // Jika masuk tanpa kata laluan, kita benarkan hanya jika password di DB sama dengan username (ciri khas voucher)
+    // ATAU jika ia memang disetkan kosong (jarang berlaku)
+    if (!password && customer.password !== username && customer.password !== '') {
+       return NextResponse.json({ error: 'Sila masukkan kata laluan untuk akaun ini' }, { status: 401 })
     }
 
     return NextResponse.json({ customer })
   } catch (err) {
-    return NextResponse.json({ error: 'Terjadi kesalahan sistem' }, { status: 500 })
+    return NextResponse.json({ error: 'Ralat sistem berlaku' }, { status: 500 })
   }
 }

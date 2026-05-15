@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Clock, CreditCard, Activity, ArrowRight, ShieldCheck, Wifi, Tag } from 'lucide-react'
+import { User, Clock, CreditCard, Activity, ArrowRight, ShieldCheck, Wifi, Tag, LogOut, ChevronRight, Zap } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function PelangganDashboard() {
@@ -11,23 +11,27 @@ export default function PelangganDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [error, setError] = useState('')
   const [paying, setPaying] = useState(false)
+  const [hasMounted, setHasMounted] = useState(false)
 
   // Cek session dan fetch data terbaru
   useEffect(() => {
+    setHasMounted(true)
     async function syncData() {
       const saved = localStorage.getItem('nuxbill_customer')
       if (saved) {
         const localData = JSON.parse(saved)
-        // Fetch data terbaru dari server
-        const res = await fetch(`/api/pelanggan/me?id=${localData.id}`)
-        if (res.ok) {
-          const freshData = await res.json()
-          setCustomer(freshData.customer)
-          localStorage.setItem('nuxbill_customer', JSON.stringify(freshData.customer))
-          setIsLoggedIn(true)
-        } else {
-          // Jika gagal fetch (misal id salah), logout saja
-          handleLogout()
+        try {
+          const res = await fetch(`/api/pelanggan/me?id=${localData.id}`)
+          if (res.ok) {
+            const freshData = await res.json()
+            setCustomer(freshData.customer)
+            localStorage.setItem('nuxbill_customer', JSON.stringify(freshData.customer))
+            setIsLoggedIn(true)
+          } else {
+            handleLogout()
+          }
+        } catch (e) {
+          console.error("Sync failed", e)
         }
       }
       setLoading(false)
@@ -40,7 +44,6 @@ export default function PelangganDashboard() {
     setLoading(true)
     setError('')
     
-    // API khusus buat pelanggan login
     const res = await fetch('/api/pelanggan/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -53,14 +56,13 @@ export default function PelangganDashboard() {
       setCustomer(data.customer)
       setIsLoggedIn(true)
     } else {
-      setError(data.error || 'Login gagal. Cek kembali username & password.')
+      setError(data.error || 'Login gagal. Sila semak semula username & kata laluan.')
     }
     setLoading(false)
   }
 
   async function handlePay() {
     setPaying(true)
-    // Panggil API buat bikin order renewal
     const res = await fetch('/api/pelanggan/renew', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,7 +73,7 @@ export default function PelangganDashboard() {
     if (data.redirect_url) {
       window.location.href = data.redirect_url
     } else {
-      alert('Gagal membuat pembayaran. Coba lagi nanti.')
+      alert('Gagal membuat pembayaran. Sila cuba sebentar lagi.')
       setPaying(false)
     }
   }
@@ -82,36 +84,71 @@ export default function PelangganDashboard() {
     setCustomer(null)
   }
 
-  if (loading) return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}><span className="spinner"></span></div>
+  if (!hasMounted || loading) return (
+    <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: '#f0fdf4' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+        <div className="spinner"></div>
+        <p style={{ color: '#15803d', fontWeight: 600 }}>Memuatkan data anda...</p>
+      </div>
+    </div>
+  )
 
   if (!isLoggedIn) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div className="glass-card" style={{ maxWidth: '400px', width: '100%', padding: '32px' }}>
+      <div style={{ minHeight: '100vh', background: 'radial-gradient(circle at top right, #f0fdf4, #dcfce7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ 
+          maxWidth: '420px', width: '100%', padding: '40px', 
+          background: 'white', borderRadius: '24px', 
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
+          border: '1px solid rgba(22, 163, 74, 0.1)'
+        }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{ width: '64px', height: '64px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <Wifi color="white" size={32} />
+            <div style={{ 
+              width: '72px', height: '72px', 
+              background: 'linear-gradient(135deg, #22c55e, #16a34a)', 
+              borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              margin: '0 auto 16px', boxShadow: '0 10px 15px -3px rgba(34, 197, 94, 0.3)'
+            }}>
+              <Wifi color="white" size={36} />
             </div>
-            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#f1f5f9' }}>Login Pelanggan</h1>
-            <p style={{ color: '#94a3b8', fontSize: '14px' }}>Pantau status & perpanjang internet kamu</p>
+            <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#166534', letterSpacing: '-0.5px' }}>Login Pelanggan</h1>
+            <p style={{ color: '#4b5563', fontSize: '15px', marginTop: '4px' }}>Pantau status & perbaharui internet anda</p>
           </div>
 
-          <form onSubmit={handleLogin} style={{ display: 'grid', gap: '16px' }}>
-            {error && <div style={{ color: '#f87171', background: 'rgba(239,68,68,0.1)', padding: '10px', borderRadius: '8px', fontSize: '14px', textAlign: 'center' }}>{error}</div>}
+          <form onSubmit={handleLogin} style={{ display: 'grid', gap: '20px' }}>
+            {error && <div style={{ color: '#b91c1c', background: '#fef2f2', padding: '12px', borderRadius: '12px', fontSize: '14px', textAlign: 'center', border: '1px solid #fee2e2' }}>{error}</div>}
             <div>
-              <label className="form-label">Username PPPoE</label>
-              <input className="form-input" placeholder="Masukkan username" value={loginForm.username} onChange={e => setLoginForm({...loginForm, username: e.target.value})} required />
+              <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '8px' }}>Username / Kod Baucar</label>
+              <input 
+                className="form-input" 
+                style={{ background: '#f9fafb', borderColor: '#e5e7eb', color: '#111827', height: '50px' }}
+                placeholder="Masukkan username atau kod anda" value={loginForm.username} onChange={e => setLoginForm({...loginForm, username: e.target.value})} required 
+              />
             </div>
             <div>
-              <label className="form-label">Password</label>
-              <input type="password" className="form-input" placeholder="Masukkan password" value={loginForm.password} onChange={e => setLoginForm({...loginForm, password: e.target.value})} required />
+              <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '8px' }}>Kata Laluan (Pilihan)</label>
+              <input 
+                type="password" 
+                className="form-input" 
+                style={{ background: '#f9fafb', borderColor: '#e5e7eb', color: '#111827', height: '50px' }}
+                placeholder="Biarkan kosong jika guna baucar" value={loginForm.password} onChange={e => setLoginForm({...loginForm, password: e.target.value})} 
+              />
+              <p style={{ fontSize: '11px', color: '#6b7280', marginTop: '6px' }}>* Pengguna baucar hanya perlu masukkan kod di kotak Username.</p>
             </div>
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px' }} disabled={loading}>
-              {loading ? 'Masuk...' : 'MASUK KE DASHBOARD'}
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              style={{ width: '100%', padding: '16px', fontSize: '16px', fontWeight: 700, borderRadius: '14px', background: '#16a34a', boxShadow: '0 4px 6px -1px rgba(22, 163, 74, 0.2)' }} 
+              disabled={loading}
+            >
+              {loading ? 'Sila tunggu...' : 'MASUK KE DASHBOARD'}
             </button>
           </form>
-          <div style={{ textAlign: 'center', marginTop: '24px' }}>
-            <a href="/beli" style={{ color: '#3b82f6', fontSize: '14px', textDecoration: 'none' }}>Bukan pelanggan PPPoE? Beli Voucher Hotspot &rarr;</a>
+          
+          <div style={{ textAlign: 'center', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #f3f4f6' }}>
+            <a href="/beli" style={{ color: '#16a34a', fontSize: '14px', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              Bukan pelanggan PPPoE? Beli Baucar <ChevronRight size={16} />
+            </a>
           </div>
         </div>
       </div>
@@ -121,52 +158,90 @@ export default function PelangganDashboard() {
   const isExpired = customer.expired_at ? new Date(customer.expired_at) < new Date() : true
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f172a', color: '#f1f5f9' }}>
-      <nav style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ minHeight: '100vh', background: '#f0fdf4', color: '#111827' }}>
+      {/* Navbar */}
+      <nav style={{ 
+        padding: '16px 24px', background: 'white', borderBottom: '1px solid #dcfce7', 
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+      }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Wifi color="white" size={18} />
+          <div style={{ 
+            width: '36px', height: '36px', 
+            background: 'linear-gradient(135deg, #22c55e, #16a34a)', 
+            borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' 
+          }}>
+            <Wifi color="white" size={20} />
           </div>
-          <span style={{ fontWeight: 800, fontSize: '18px' }}>NuxBill <span style={{ color: '#3b82f6' }}>User</span></span>
+          <span style={{ fontWeight: 900, fontSize: '20px', color: '#166534', letterSpacing: '-0.5px' }}>
+            NuxBill <span style={{ color: '#ea580c' }}>User</span>
+          </span>
         </div>
-        <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '14px', cursor: 'pointer' }}>Logout</button>
+        <button 
+          onClick={handleLogout} 
+          style={{ 
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: '#fef2f2', border: '1px solid #fee2e2', color: '#991b1b', 
+            padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' 
+          }}
+        >
+          <LogOut size={14} /> Log Keluar
+        </button>
       </nav>
 
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '24px' }}>
-        <div className="glass-card" style={{ padding: '24px', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <User color="#3b82f6" />
+      <div style={{ maxWidth: '640px', margin: '0 auto', padding: '24px' }}>
+        {/* Profile Card */}
+        <div style={{ 
+          background: 'white', padding: '28px', borderRadius: '24px', marginBottom: '24px',
+          boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)',
+          border: '1px solid #dcfce7'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+            <div style={{ 
+              width: '56px', height: '56px', borderRadius: '18px', 
+              background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: '2px solid #dcfce7'
+            }}>
+              <User color="#16a34a" size={28} />
             </div>
             <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 700 }}>{customer.fullname}</h2>
-              <span style={{ fontSize: '14px', color: '#94a3b8' }}>@{customer.username}</span>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{customer.fullname}</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '14px', color: '#6b7280' }}>@{customer.username}</span>
+                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d1d5db' }}></span>
+                <span style={{ fontSize: '14px', color: '#16a34a', fontWeight: 600 }}>Pelanggan PPPoE</span>
+              </div>
             </div>
             <div style={{ marginLeft: 'auto' }}>
-              <span className={`badge ${isExpired ? 'badge-danger' : 'badge-success'}`}>
+              <span style={{ 
+                padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700,
+                background: isExpired ? '#fef2f2' : '#f0fdf4',
+                color: isExpired ? '#b91c1c' : '#166534',
+                border: `1px solid ${isExpired ? '#fee2e2' : '#dcfce7'}`
+              }}>
                 {isExpired ? 'Layanan Terputus' : 'Layanan Aktif'}
               </span>
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', fontSize: '12px', marginBottom: '4px' }}>
-                <Clock size={14} /> AKTIF SAMPAI
+            <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '18px', border: '1px solid #f3f4f6' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280', fontSize: '12px', marginBottom: '6px', fontWeight: 600 }}>
+                <Clock size={14} style={{color: '#3b82f6'}} /> AKTIF SEHINGGA
               </div>
-              <div style={{ fontWeight: 700, fontSize: '16px', color: isExpired ? '#f87171' : '#f1f5f9' }}>
+              <div style={{ fontWeight: 800, fontSize: '17px', color: isExpired ? '#b91c1c' : '#111827' }}>
                 {customer.expired_at ? new Date(customer.expired_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Belum Aktif'}
               </div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', fontSize: '12px', marginBottom: '4px' }}>
-                <Activity size={14} /> PAKET SAAT INI
+            <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '18px', border: '1px solid #f3f4f6' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280', fontSize: '12px', marginBottom: '6px', fontWeight: 600 }}>
+                <Activity size={14} style={{color: '#10b981'}} /> PAKEJ SEMASA
               </div>
-              <div style={{ fontWeight: 700, fontSize: '16px' }}>
+              <div style={{ fontWeight: 800, fontSize: '17px', color: '#111827' }}>
                 {customer.plans?.name_plan || 'N/A'}
                 {customer.plans?.bandwidths && (
-                  <div style={{ fontSize: '11px', color: '#60a5fa', fontWeight: 600, marginTop: '2px' }}>
-                    🚀 {customer.plans.bandwidths.rate_down}{customer.plans.bandwidths.rate_down_unit} Speed
+                  <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: 700, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Zap size={10} /> {customer.plans.bandwidths.rate_down}{customer.plans.bandwidths.rate_down_unit} Kelajuan
                   </div>
                 )}
               </div>
@@ -174,97 +249,177 @@ export default function PelangganDashboard() {
           </div>
         </div>
 
+        {/* Payment Alert / Action */}
         {isExpired && (
-          <div className="glass-card" style={{ padding: '24px', border: '2px solid #ef4444', background: 'rgba(239,68,68,0.05)', animation: 'pulse 2s infinite', marginBottom: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ padding: '10px', background: '#ef4444', borderRadius: '10px' }}>
-                <Activity color="white" size={24} />
-              </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#f1f5f9', margin: 0 }}>Layanan Terputus!</h3>
-            </div>
-            <p style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '20px', lineHeight: 1.6 }}>
-              Waduh! Sepertinya masa aktif paket internet kamu sudah habis nih. Yuk perpanjang sekarang biar bisa langsung <span style={{ color: '#10b981', fontWeight: 700 }}>Aktif Otomatis</span> lagi!
-            </p>
-            <div style={{ padding: '16px', background: 'rgba(15,23,42,0.5)', borderRadius: '12px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '14px', color: '#94a3b8' }}>Paket</span>
-                <span style={{ fontSize: '14px', color: '#f1f5f9', fontWeight: 600 }}>{customer.plans?.name_plan}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px', color: '#94a3b8' }}>Total Bayar</span>
-                <span style={{ fontSize: '22px', fontWeight: 900, color: '#10b981' }}>{formatCurrency(customer.plans?.price || 0)}</span>
-              </div>
-            </div>
-            <button onClick={handlePay} className="btn btn-primary" style={{ width: '100%', padding: '18px', fontSize: '18px', fontWeight: 800, borderRadius: '14px', boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.5)', marginBottom: '12px' }} disabled={paying}>
-              {paying ? 'Menuju Pembayaran...' : <><CreditCard size={20} style={{marginRight: '12px'}} /> BAYAR OTOMATIS (toyyibPay)</>}
-            </button>
+          <div style={{ 
+            padding: '32px', borderRadius: '28px', border: '1px solid #fee2e2', 
+            background: 'white', boxShadow: '0 15px 30px -10px rgba(185, 28, 28, 0.1)', 
+            marginBottom: '24px', position: 'relative', overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, width: '100px', height: '100px', background: '#fef2f2', borderRadius: '0 0 0 100%', zIndex: 0 }}></div>
             
-            <button 
-              onClick={() => {
-                const msg = `Halo Admin, saya ingin bayar manual untuk paket ${customer.plans?.name_plan}. Username: ${customer.username}`;
-                window.open(`https://wa.me/60123456789?text=${encodeURIComponent(msg)}`, '_blank');
-              }} 
-              className="btn btn-secondary" 
-              style={{ width: '100%', padding: '14px', fontSize: '14px', borderRadius: '12px', background: 'rgba(16,185,129,0.1)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}
-            >
-              🏧 TRANSFER MANUAL / WHATSAPP
-            </button>
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}>
+                <div style={{ padding: '12px', background: '#ef4444', borderRadius: '14px', boxShadow: '0 8px 16px -4px rgba(239, 68, 68, 0.4)' }}>
+                  <Activity color="white" size={24} />
+                </div>
+                <h3 style={{ fontSize: '22px', fontWeight: 900, color: '#991b1b', margin: 0, letterSpacing: '-0.5px' }}>Internet Terputus!</h3>
+              </div>
+              
+              <p style={{ fontSize: '15px', color: '#4b5563', marginBottom: '24px', lineHeight: 1.6 }}>
+                Masa aktif pakej anda telah tamat. Jom perbaharui sekarang untuk sambungan <span style={{ color: '#16a34a', fontWeight: 700 }}>Aktif Automatik</span> serta-merta!
+              </p>
 
-            <div style={{ marginTop: '20px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', fontSize: '12px', color: '#94a3b8', border: '1px dashed rgba(255,255,255,0.1)' }}>
-              <b>Info Rekening:</b><br/>
-              Maybank: 1234567890<br/>
-              CIMB: 0987654321<br/>
-              A.n: NuxBill Malaysia
+              <div style={{ 
+                padding: '20px', background: '#f8fafc', borderRadius: '16px', marginBottom: '24px', 
+                border: '1px solid #e2e8f0', display: 'grid', gap: '10px' 
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Pakej Pembaharuan</span>
+                  <span style={{ fontSize: '14px', color: '#1e293b', fontWeight: 700 }}>{customer.plans?.name_plan}</span>
+                </div>
+                <div style={{ height: '1px', background: '#e2e8f0' }}></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Jumlah Bayaran</span>
+                  <span style={{ fontSize: '24px', fontWeight: 950, color: '#16a34a' }}>{formatCurrency(customer.plans?.price || 0)}</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={handlePay} 
+                className="btn btn-primary" 
+                style={{ 
+                  width: '100%', padding: '20px', fontSize: '18px', fontWeight: 900, borderRadius: '18px', 
+                  background: '#16a34a', border: 'none', color: 'white',
+                  boxShadow: '0 10px 20px -5px rgba(22, 163, 74, 0.4)', marginBottom: '16px',
+                  cursor: 'pointer', transition: 'transform 0.2s'
+                }} 
+                disabled={paying}
+              >
+                {paying ? 'Menghubungi Gerbang Bayaran...' : <><CreditCard size={22} style={{marginRight: '12px'}} /> BAYAR SEKARANG (Online)</>}
+              </button>
+              
+              <button 
+                onClick={() => {
+                  const msg = `Halo Admin, saya ingin perbaharui pakej ${customer.plans?.name_plan}. Username: ${customer.username}`;
+                  window.open(`https://wa.me/60123456789?text=${encodeURIComponent(msg)}`, '_blank');
+                }} 
+                style={{ 
+                  width: '100%', padding: '16px', fontSize: '14px', fontWeight: 700, borderRadius: '14px', 
+                  background: 'white', color: '#16a34a', border: '2px solid #dcfce7', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                }}
+              >
+                🏧 TRANSFER MANUAL / WHATSAPP
+              </button>
+
+              <div style={{ 
+                marginTop: '24px', padding: '16px', background: '#fdfcfb', borderRadius: '14px', 
+                fontSize: '13px', color: '#71717a', border: '1px dashed #e4e4e7', lineHeight: 1.5
+              }}>
+                <b style={{ color: '#18181b' }}>Maklumat Bank:</b><br/>
+                Maybank: <span style={{ color: '#16a34a', fontWeight: 700 }}>1234567890</span><br/>
+                CIMB: <span style={{ color: '#16a34a', fontWeight: 700 }}>0987654321</span><br/>
+                A.n: <span style={{ color: '#18181b', fontWeight: 600 }}>NuxBill Malaysia</span>
+              </div>
             </div>
           </div>
         )}
 
-        <div className="glass-card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ArrowRight size={16} color="#3b82f6" /> Riwayat Pembayaran
+        {/* History Card */}
+        <div style={{ 
+          background: 'white', padding: '28px', borderRadius: '24px', 
+          boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #f3f4f6' 
+        }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#111827' }}>
+            <div style={{ padding: '8px', background: '#f0fdf4', borderRadius: '8px' }}><Clock size={18} color="#16a34a" /></div>
+            Sejarah Pembayaran
           </h3>
           <div style={{ display: 'grid', gap: '12px' }}>
             {customer.payment_orders && customer.payment_orders.length > 0 ? (
               customer.payment_orders
                 .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                 .map((order: any) => (
-                  <div key={order.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div>
-                      <div style={{ fontSize: '14px', fontWeight: 600 }}>{order.plan_name || 'Pembaharuan Paket'}</div>
-                      <div style={{ fontSize: '12px', color: '#64748b' }}>{new Date(order.created_at).toLocaleDateString('ms-MY')}</div>
+                  <div key={order.id} style={{ 
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
+                    padding: '16px', background: '#f9fafb', borderRadius: '16px', border: '1px solid #f3f4f6' 
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ 
+                        width: '40px', height: '40px', background: order.status === 'paid' ? '#f0fdf4' : '#fffbeb', 
+                        borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                      }}>
+                        <Receipt size={18} color={order.status === 'paid' ? '#16a34a' : '#d97706'} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '15px', fontWeight: 700, color: '#1f2937' }}>{order.plan_name || 'Pakej Internet'}</div>
+                        <div style={{ fontSize: '12px', color: '#6b7280' }}>{new Date(order.created_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                      </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#10b981' }}>{formatCurrency(order.price)}</div>
-                      <span style={{ fontSize: '10px', color: order.status === 'paid' ? '#10b981' : '#f59e0b', textTransform: 'uppercase', fontWeight: 800 }}>
-                        {order.status === 'paid' ? 'LUNAS' : 'PENDING'}
+                      <div style={{ fontSize: '16px', fontWeight: 800, color: order.status === 'paid' ? '#16a34a' : '#d97706' }}>{formatCurrency(order.price)}</div>
+                      <span style={{ 
+                        fontSize: '10px', padding: '2px 8px', borderRadius: '10px', 
+                        background: order.status === 'paid' ? '#dcfce7' : '#fef3c7',
+                        color: order.status === 'paid' ? '#166534' : '#92400e',
+                        fontWeight: 800, textTransform: 'uppercase'
+                      }}>
+                        {order.status === 'paid' ? 'BERJAYA' : 'TERTUNDA'}
                       </span>
                     </div>
                   </div>
                 ))
             ) : (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#64748b', fontSize: '14px' }}>Belum ada riwayat pembayaran</div>
+              <div style={{ textAlign: 'center', padding: '32px', color: '#9ca3af', fontSize: '14px' }}>Tiada rekod pembayaran dijumpai.</div>
             )}
           </div>
         </div>
-        <div className="glass-card" style={{ padding: '24px', marginTop: '24px', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))', border: '1px solid rgba(59,130,246,0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ padding: '12px', background: '#3b82f6', borderRadius: '12px' }}>
-              <Tag color="white" size={24} />
-            </div>
-            <div>
-              <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Beli Voucher Hotspot</h3>
-              <p style={{ fontSize: '13px', color: '#94a3b8', margin: '4px 0 0' }}>Beli voucher untuk teman atau perangkat lain</p>
-            </div>
-            <button 
-              onClick={() => window.location.href = '/beli'} 
-              className="btn btn-primary btn-sm" 
-              style={{ marginLeft: 'auto', padding: '10px 20px' }}
-            >
-              BELI &rarr;
-            </button>
+
+        {/* Upsell / Other actions */}
+        <div style={{ 
+          marginTop: '24px', padding: '24px', borderRadius: '24px', 
+          background: 'linear-gradient(135deg, #16a34a, #15803d)', 
+          boxShadow: '0 10px 15px -3px rgba(22, 163, 74, 0.2)',
+          display: 'flex', alignItems: 'center', gap: '16px'
+        }}>
+          <div style={{ 
+            padding: '12px', background: 'rgba(255,255,255,0.2)', borderRadius: '14px', backdropFilter: 'blur(4px)'
+          }}>
+            <Tag color="white" size={24} />
           </div>
+          <div style={{ flex: 1 }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'white', margin: 0 }}>Beli Baucar Hotspot</h3>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', margin: '4px 0 0' }}>Sesuai untuk rakan atau peranti tetamu.</p>
+          </div>
+          <button 
+            onClick={() => window.location.href = '/beli'} 
+            style={{ 
+              background: 'white', border: 'none', color: '#16a34a', 
+              padding: '10px 20px', borderRadius: '12px', fontWeight: 800, 
+              fontSize: '13px', cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 
+            }}
+          >
+            BELI &rarr;
+          </button>
+        </div>
+
+        {/* Footer */}
+        <div style={{ textAlign: 'center', marginTop: '40px', paddingBottom: '20px' }}>
+          <p style={{ fontSize: '12px', color: '#9ca3af' }}>&copy; 2026 NuxBill Malaysia. Semua Hak Terpelihara.</p>
         </div>
       </div>
     </div>
+  )
+}
+
+function Receipt({ size, color }: { size: number; color: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z" />
+      <path d="M16 8h-4" />
+      <path d="M16 12h-4" />
+      <path d="M8 12h.01" />
+      <path d="M8 8h.01" />
+    </svg>
   )
 }
