@@ -35,10 +35,10 @@ export default async function DashboardPage() {
   const stats = await getDashboardStats()
 
   const statCards = [
-    { label: 'Total Pelanggan', value: stats.totalCustomers?.toLocaleString() || '0', icon: Users, color: 'blue', href: '/admin/customers', change: 'Aktif bulan ini' },
-    { label: 'Revenue Bulan Ini', value: formatCurrency(stats.monthlyRevenue), icon: TrendingUp, color: 'green', href: '/admin/transactions', change: 'Transaksi terbayar' },
-    { label: 'Voucher Tersedia', value: stats.totalVouchers?.toLocaleString() || '0', icon: Ticket, color: 'purple', href: '/admin/vouchers', change: 'Siap digunakan' },
-    { label: 'Paket Aktif', value: stats.totalPlans?.toLocaleString() || '0', icon: Package, color: 'orange', href: '/admin/plans', change: 'Tersedia di storefront' },
+    { label: 'Jumlah Pelanggan', value: stats.totalCustomers?.toLocaleString() || '0', icon: Users, color: 'blue', href: '/admin/customers', change: 'Aktif bulan ini' },
+    { label: 'Hasil Bulan Ini', value: formatCurrency(stats.monthlyRevenue), icon: TrendingUp, color: 'green', href: '/admin/transactions', change: 'Transaksi dibayar' },
+    { label: 'Baucar Tersedia', value: stats.totalVouchers?.toLocaleString() || '0', icon: Ticket, color: 'purple', href: '/admin/vouchers', change: 'Sedia digunakan' },
+    { label: 'Pakej Aktif', value: stats.totalPlans?.toLocaleString() || '0', icon: Package, color: 'orange', href: '/admin/plans', change: 'Tersedia di storefront' },
   ]
 
   return (
@@ -47,21 +47,21 @@ export default async function DashboardPage() {
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <h1 className="page-title">Selamat datang, {session?.fullname?.split(' ')[0]} 👋</h1>
-            <p className="page-subtitle">Berikut ringkasan sistem billing kamu hari ini</p>
+            <h1 className="page-title">Selamat Datang, {session?.fullname?.split(' ')[0]} 👋</h1>
+            <p className="page-subtitle">Berikut ringkasan sistem billing anda hari ini</p>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
             <Link href="/beli" target="_blank" className="btn btn-success btn-sm">
               <Wifi size={14} /> Lihat Storefront
             </Link>
             <Link href="/admin/vouchers/generate" className="btn btn-primary btn-sm">
-              <Ticket size={14} /> Generate Voucher
+              <Ticket size={14} /> Jana Baucar
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Stat Cards */}
+      {/* Kad Statistik */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         {statCards.map((card) => {
           const Icon = card.icon
@@ -71,15 +71,15 @@ export default async function DashboardPage() {
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
                   <div style={{
                     width: '42px', height: '42px', borderRadius: '10px',
-                    background: card.color === 'blue' ? 'rgba(59,130,246,0.15)' :
-                      card.color === 'green' ? 'rgba(16,185,129,0.15)' :
-                      card.color === 'purple' ? 'rgba(139,92,246,0.15)' : 'rgba(245,158,11,0.15)',
+                    background: card.color === 'blue' ? 'rgba(96,165,250,0.15)' :
+                      card.color === 'green' ? 'rgba(74,222,128,0.15)' :
+                      card.color === 'purple' ? 'rgba(167,139,250,0.15)' : 'rgba(251,191,36,0.15)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <Icon size={20} color={
-                      card.color === 'blue' ? '#3b82f6' :
-                      card.color === 'green' ? '#10b981' :
-                      card.color === 'purple' ? '#8b5cf6' : '#f59e0b'
+                      card.color === 'blue' ? '#60a5fa' :
+                      card.color === 'green' ? '#4ade80' :
+                      card.color === 'purple' ? '#a78bfa' : '#fbbf24'
                     } />
                   </div>
                   <ArrowUpRight size={16} style={{ color: '#475569' }} />
@@ -95,14 +95,14 @@ export default async function DashboardPage() {
         })}
       </div>
 
-      {/* Bottom row */}
+      {/* Baris Bawah */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '16px' }}>
 
-        {/* Recent Orders */}
+        {/* Order Terkini */}
         <div className="glass-card" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#f1f5f9' }}>Order Terbaru</h2>
-            <Link href="/admin/transactions" style={{ fontSize: '0.78rem', color: '#3b82f6', textDecoration: 'none' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#f1f5f9' }}>Order Terkini</h2>
+            <Link href="/admin/transactions" style={{ fontSize: '0.78rem', color: '#4ade80', textDecoration: 'none' }}>
               Lihat semua →
             </Link>
           </div>
@@ -110,30 +110,30 @@ export default async function DashboardPage() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Order ID</th>
+                  <th>ID Order</th>
                   <th>Pelanggan</th>
-                  <th>Paket</th>
+                  <th>Pakej</th>
                   <th>Harga</th>
                   <th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {stats.recentOrders?.length === 0 && (
-                  <tr><td colSpan={5} style={{ textAlign: 'center', color: '#475569', padding: '32px' }}>Belum ada order</td></tr>
+                  <tr><td colSpan={5} style={{ textAlign: 'center', color: '#475569', padding: '32px' }}>Tiada order lagi</td></tr>
                 )}
                 {stats.recentOrders?.map((order: Record<string, unknown>) => (
                   <tr key={order.id as number}>
                     <td style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#94a3b8' }}>{(order.order_id as string)?.slice(-12)}</td>
                     <td style={{ fontWeight: 500 }}>{order.customer_name as string || '-'}</td>
                     <td>{(order.plans as Record<string, unknown>)?.name_plan as string || order.plan_name as string}</td>
-                    <td style={{ color: '#10b981', fontWeight: 600 }}>{formatCurrency(parseFloat(order.price as string || '0'))}</td>
+                    <td style={{ color: '#4ade80', fontWeight: 600 }}>{formatCurrency(parseFloat(order.price as string || '0'))}</td>
                     <td>
                       <span className={`badge ${
                         order.status === 'paid' ? 'badge-success' :
                         order.status === 'pending' ? 'badge-warning' :
                         order.status === 'failed' ? 'badge-danger' : 'badge-info'
                       }`}>
-                        {order.status as string}
+                        {order.status === 'paid' ? 'Dibayar' : order.status === 'pending' ? 'Menunggu' : order.status as string}
                       </span>
                     </td>
                   </tr>
@@ -143,44 +143,44 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Status Panel */}
+        {/* Panel Samping */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-          {/* MikroTik Agent Status */}
+          {/* Status Agent MikroTik */}
           <div className="glass-card" style={{ padding: '20px' }}>
             <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Router size={16} style={{ color: '#3b82f6' }} /> Status Agent
+              <Router size={16} style={{ color: '#4ade80' }} /> Status Agent
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Local Agent</span>
-                <span className="badge badge-warning">Belum dikonfigurasi</span>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Ejen Tempatan</span>
+                <span className="badge badge-warning">Belum dikonfigurasikan</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Perintah Pending</span>
-                <span style={{ fontWeight: 700, color: stats.pendingCommands > 0 ? '#f59e0b' : '#10b981' }}>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Arahan Tertunda</span>
+                <span style={{ fontWeight: 700, color: stats.pendingCommands > 0 ? '#fbbf24' : '#4ade80' }}>
                   {stats.pendingCommands}
                 </span>
               </div>
-              <div style={{ marginTop: '4px', padding: '10px', background: 'rgba(59,130,246,0.08)', borderRadius: '8px', border: '1px solid rgba(59,130,246,0.15)' }}>
+              <div style={{ marginTop: '4px', padding: '10px', background: 'rgba(74,222,128,0.06)', borderRadius: '8px', border: '1px solid rgba(74,222,128,0.15)' }}>
                 <p style={{ fontSize: '0.72rem', color: '#64748b', lineHeight: 1.6 }}>
-                  Install <strong style={{ color: '#3b82f6' }}>mikrotik-agent</strong> di server lokal yang terhubung ke jaringan MikroTik
+                  Pasang <strong style={{ color: '#4ade80' }}>mikrotik-agent</strong> di pelayan tempatan yang bersambung ke rangkaian MikroTik
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Quick Actions */}
+          {/* Tindakan Pantas */}
           <div className="glass-card" style={{ padding: '20px' }}>
             <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Activity size={16} style={{ color: '#10b981' }} /> Aksi Cepat
+              <Activity size={16} style={{ color: '#4ade80' }} /> Tindakan Pantas
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {[
-                { href: '/admin/customers', label: '+ Tambah Pelanggan', color: '#3b82f6' },
-                { href: '/admin/vouchers', label: '🎫 Generate Voucher', color: '#8b5cf6' },
-                { href: '/admin/plans', label: '📦 Tambah Paket', color: '#10b981' },
-                { href: '/admin/routers', label: '📡 Tambah Router', color: '#f59e0b' },
+                { href: '/admin/customers', label: '+ Tambah Pelanggan', color: '#60a5fa' },
+                { href: '/admin/vouchers', label: '🎫 Jana Baucar', color: '#a78bfa' },
+                { href: '/admin/plans', label: '📦 Tambah Pakej', color: '#4ade80' },
+                { href: '/admin/routers', label: '📡 Tambah Router', color: '#fbbf24' },
               ].map(a => (
                 <Link
                   key={a.href}

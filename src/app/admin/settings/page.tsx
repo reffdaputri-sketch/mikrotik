@@ -11,7 +11,7 @@ export default function SettingsPage() {
     company_name: '',
     address: '',
     phone: '',
-    currency_code: 'IDR',
+    currency_code: 'RM',
     midtrans_client_key: '',
     midtrans_server_key: '',
     midtrans_is_production: 'false',
@@ -41,28 +41,28 @@ export default function SettingsPage() {
       body: JSON.stringify(config)
     })
     if (res.ok) {
-      alert('Pengaturan berhasil disimpan!')
+      alert('Tetapan berjaya disimpan!')
     }
     setSaving(false)
   }
 
-  if (loading) return <div className="page-content">Loading settings...</div>
+  if (loading) return <div className="page-content">Memuatkan tetapan...</div>
 
   return (
     <div className="page-content">
       <div className="page-header">
-        <h1 className="page-title">Pengaturan Sistem</h1>
-        <p className="page-subtitle">Konfigurasi aplikasi, gateway pembayaran, dan keamanan</p>
+        <h1 className="page-title">Tetapan Sistem</h1>
+        <p className="page-subtitle">Konfigurasi aplikasi, gerbang pembayaran, dan keselamatan</p>
       </div>
 
       <form onSubmit={handleSave}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
           
-          {/* General Settings */}
+          {/* General Tetapan */}
           <div className="glass-card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
-              <Globe size={20} color="#3b82f6" />
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Informasi Umum</h3>
+              <Globe size={20} color="#60a5fa" />
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Maklumat Umum</h3>
             </div>
             <div style={{ display: 'grid', gap: '16px' }}>
               <div>
@@ -70,7 +70,7 @@ export default function SettingsPage() {
                 <input className="form-input" value={config.app_name} onChange={e => setConfig({...config, app_name: e.target.value})} />
               </div>
               <div>
-                <label className="form-label">Nama Perusahaan / ISP</label>
+                <label className="form-label">Nama Syarikat / ISP</label>
                 <input className="form-input" value={config.company_name} onChange={e => setConfig({...config, company_name: e.target.value})} />
               </div>
               <div>
@@ -79,26 +79,26 @@ export default function SettingsPage() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label className="form-label">Telepon</label>
+                  <label className="form-label">No. Telefon</label>
                   <input className="form-input" value={config.phone} onChange={e => setConfig({...config, phone: e.target.value})} />
                 </div>
                 <div>
-                  <label className="form-label">Mata Uang</label>
+                  <label className="form-label">Mata Wang</label>
                   <input className="form-input" value={config.currency_code} onChange={e => setConfig({...config, currency_code: e.target.value})} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Duitku Settings */}
+          {/* Duitku Tetapan */}
           <div className="glass-card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
-              <CreditCard size={20} color="#10b981" />
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Gateway Duitku</h3>
+              <CreditCard size={20} color="#4ade80" />
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Gerbang Pembayaran (Duitku)</h3>
             </div>
             <div style={{ display: 'grid', gap: '16px' }}>
               <div>
-                <label className="form-label">Duitku Merchant Code</label>
+                <label className="form-label">Kod Pedagang Duitku</label>
                 <input className="form-input" value={config.duitku_merchant_code} onChange={e => setConfig({...config, duitku_merchant_code: e.target.value})} />
               </div>
               <div>
@@ -106,14 +106,14 @@ export default function SettingsPage() {
                 <input type="password" className="form-input" value={config.duitku_api_key} onChange={e => setConfig({...config, duitku_api_key: e.target.value})} />
               </div>
               <div>
-                <label className="form-label">Mode Produksi</label>
+                <label className="form-label">Mod Produksi</label>
                 <select className="form-input" value={config.duitku_is_production} onChange={e => setConfig({...config, duitku_is_production: e.target.value})}>
-                  <option value="false">Sandbox (Testing)</option>
-                  <option value="true">Production (Live)</option>
+                  <option value="false">Sandbox (Percubaan)</option>
+                  <option value="true">Produksi (Live)</option>
                 </select>
               </div>
-              <div style={{ background: 'rgba(16,185,129,0.05)', padding: '12px', borderRadius: '8px', fontSize: '0.75rem', color: '#64748b' }}>
-                Gunakan URL callback berikut di dashboard Duitku:<br/>
+              <div style={{ background: 'rgba(74,222,128,0.05)', padding: '12px', borderRadius: '8px', fontSize: '0.75rem', color: '#64748b' }}>
+                Gunakan URL callback berikut di papan pemuka Duitku:<br/>
                 <code>{process.env.NEXT_PUBLIC_APP_URL}/api/webhook/duitku</code>
               </div>
             </div>
@@ -122,14 +122,14 @@ export default function SettingsPage() {
           {/* Security & Agent */}
           <div className="glass-card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
-              <Shield size={20} color="#f59e0b" />
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Keamanan & Agent</h3>
+              <Shield size={20} color="#fbbf24" />
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Keselamatan & Ejen</h3>
             </div>
             <div style={{ display: 'grid', gap: '16px' }}>
               <div>
-                <label className="form-label">Local Agent Secret</label>
+                <label className="form-label">Rahsia Ejen Tempatan (Secret)</label>
                 <input className="form-input" value={config.local_agent_secret} onChange={e => setConfig({...config, local_agent_secret: e.target.value})} />
-                <p style={{ fontSize: '0.65rem', color: '#475569', marginTop: '4px' }}>Password bersama antara Cloud App dan Local Agent di PC kamu.</p>
+                <p style={{ fontSize: '0.65rem', color: '#475569', marginTop: '4px' }}>Kata laluan bersama antara Aplikasi Awan dan Ejen Tempatan di PC anda.</p>
               </div>
             </div>
           </div>

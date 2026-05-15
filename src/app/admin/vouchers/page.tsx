@@ -71,7 +71,7 @@ export default function VouchersPage() {
   }
 
   async function handleDelete(id: number) {
-    if (!confirm('Hapus voucher ini?')) return
+    if (!confirm('Padam baucar ini?')) return
     await fetch(`/api/admin/vouchers?id=${id}`, { method: 'DELETE' })
     fetchVouchers()
   }
@@ -99,18 +99,18 @@ export default function VouchersPage() {
     <div className="page-content">
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 className="page-title">Voucher Internet</h1>
-          <p className="page-subtitle">{vouchers.length} voucher dalam database</p>
+          <h1 className="page-title">Baucar Internet</h1>
+          <p className="page-subtitle">{vouchers.length} baucar dalam pangkalan data</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           {selectedIds.length > 0 && (
-            <button onClick={handlePrintSelected} className="btn btn-secondary btn-sm" style={{ background: 'rgba(59,130,246,0.2)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.3)' }}>
+            <button onClick={handlePrintSelected} className="btn btn-secondary btn-sm" style={{ background: 'rgba(96,165,250,0.2)', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.3)' }}>
               <Printer size={14} /> Cetak ({selectedIds.length})
             </button>
           )}
           <button onClick={fetchVouchers} className="btn btn-secondary btn-sm"><RefreshCw size={14} /></button>
           <Link href="/admin/vouchers/generate" className="btn btn-primary btn-sm">
-            <Plus size={14} /> Generate Voucher
+            <Plus size={14} /> Jana Baucar
           </Link>
         </div>
       </div>
@@ -118,15 +118,15 @@ export default function VouchersPage() {
       <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', maxWidth: '320px', flex: 1 }}>
           <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#475569' }} />
-          <input className="form-input" style={{ paddingLeft: '36px' }} placeholder="Cari kode atau paket..." value={search} onChange={e => setSearch(e.target.value)} />
+          <input className="form-input" style={{ paddingLeft: '36px' }} placeholder="Cari kod atau pakej..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Filter size={14} color="#64748b" />
           <select className="form-input" style={{ width: 'auto', padding: '6px 12px' }} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             <option value="all">Semua Status</option>
-            <option value="unused">Belum Terpakai</option>
-            <option value="used">Terpakai</option>
-            <option value="expired">Expired</option>
+            <option value="unused">Belum Digunakan</option>
+            <option value="used">Telah Digunakan</option>
+            <option value="expired">Tamat Tempoh</option>
           </select>
         </div>
       </div>
@@ -139,17 +139,17 @@ export default function VouchersPage() {
                 <th style={{ width: '40px' }}>
                   <input type="checkbox" checked={selectedIds.length === filtered.length && filtered.length > 0} onChange={toggleSelectAll} />
                 </th>
-                <th>Kode Voucher</th>
-                <th>Paket</th>
+                <th>Kod Baucar</th>
+                <th>Pakej</th>
                 <th>Router</th>
                 <th>Dibuat</th>
                 <th>Status</th>
-                <th>Aksi</th>
+                <th>Tindakan</th>
               </tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Loading...</td></tr>}
-              {!loading && filtered.length === 0 && <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Belum ada voucher</td></tr>}
+              {loading && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Memuatkan...</td></tr>}
+              {!loading && filtered.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Tiada baucar dijumpai</td></tr>}
               {filtered.map(v => (
                 <tr key={v.id}>
                   <td>
@@ -169,13 +169,13 @@ export default function VouchersPage() {
                       {v.status === 'unused' && <Clock size={10} style={{marginRight: '4px'}} />}
                       {v.status === 'used' && <CheckCircle size={10} style={{marginRight: '4px'}} />}
                       {v.status === 'expired' && <XCircle size={10} style={{marginRight: '4px'}} />}
-                      {v.status}
+                      {v.status === 'unused' ? 'BELUM GUNA' : v.status === 'used' ? 'TERPAKAI' : 'TAMAT TEMPOH'}
                     </span>
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '6px' }}>
-                      <button onClick={() => window.open(`/admin/vouchers/print?ids=${v.id}`, '_blank')} className="btn btn-secondary btn-sm" style={{ padding: '5px 8px' }} title="Print"><Printer size={13} /></button>
-                      <button onClick={() => handleDelete(v.id)} className="btn btn-danger btn-sm" style={{ padding: '5px 8px' }} title="Hapus"><Trash2 size={13} /></button>
+                      <button onClick={() => window.open(`/admin/vouchers/print?ids=${v.id}`, '_blank')} className="btn btn-secondary btn-sm" style={{ padding: '5px 8px' }} title="Cetak"><Printer size={13} /></button>
+                      <button onClick={() => handleDelete(v.id)} className="btn btn-danger btn-sm" style={{ padding: '5px 8px' }} title="Padam"><Trash2 size={13} /></button>
                     </div>
                   </td>
                 </tr>
@@ -185,72 +185,7 @@ export default function VouchersPage() {
         </div>
       </div>
 
-      {/* Generate Modal */}
-      {showGenModal && (
-        <div className="modal-overlay" onClick={() => setShowGenModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Generate Voucher Masal</h3>
-              <button onClick={() => setShowGenModal(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
-            </div>
-            <form onSubmit={handleGenerate}>
-              <div className="modal-body" style={{ display: 'grid', gap: '14px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label className="form-label">Paket Internet *</label>
-                    <select className="form-input" value={genForm.plan_id} onChange={e => setGenForm({...genForm, plan_id: e.target.value})} required>
-                      <option value="">-- Pilih Paket --</option>
-                      {plans.map(p => <option key={p.id} value={p.id}>{p.name_plan}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="form-label">Router (Opsional)</label>
-                    <select className="form-input" value={genForm.router_id} onChange={e => setGenForm({...genForm, router_id: e.target.value})}>
-                      <option value="">-- Semua Router --</option>
-                      {routers.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
-                    </select>
-                  </div>
-                </div>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label className="form-label">Jumlah Voucher *</label>
-                    <input type="number" className="form-input" value={genForm.quantity} onChange={e => setGenForm({...genForm, quantity: e.target.value})} required min="1" max="500" />
-                  </div>
-                  <div>
-                    <label className="form-label">Tipe Login</label>
-                    <select className="form-input" value={genForm.type} onChange={e => setGenForm({...genForm, type: e.target.value})}>
-                      <option value="Hotspot">Hotspot</option>
-                      <option value="PPPOE">PPPoE</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label className="form-label">Panjang Kode</label>
-                    <input type="number" className="form-input" value={genForm.length} onChange={e => setGenForm({...genForm, length: e.target.value})} min="4" max="16" />
-                  </div>
-                  <div>
-                    <label className="form-label">Prefix (Awalan)</label>
-                    <input className="form-input" placeholder="Misal: WI-" value={genForm.prefix} onChange={e => setGenForm({...genForm, prefix: e.target.value})} />
-                  </div>
-                </div>
-
-                <div style={{ background: 'rgba(59,130,246,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(59,130,246,0.1)' }}>
-                  <p style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                    💡 Voucher yang digenerate di sini adalah <strong>stok voucher</strong> yang bisa digunakan oleh admin atau akan diambil otomatis saat pelanggan beli via storefront.
-                  </p>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" onClick={() => setShowGenModal(false)} className="btn btn-secondary">Batal</button>
-                <button type="submit" className="btn btn-primary" disabled={generating}>{generating ? 'Sedang Generate...' : 'Generate Sekarang'}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Generate Modal (Backup if needed, usually uses /admin/vouchers/generate page) */}
     </div>
   )
 }

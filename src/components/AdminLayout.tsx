@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   LayoutDashboard, Users, Package, Router, Receipt,
   Ticket, Settings, LogOut, Menu, X, Wifi,
-  ChevronRight, Bell, User, Activity, MapPin
+  ChevronRight, Bell, User, Activity, MapPin, Image
 } from 'lucide-react'
 
 const navItems = [
@@ -14,18 +14,18 @@ const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { section: 'Billing' },
   { href: '/admin/customers', label: 'Pelanggan', icon: Users },
-  { href: '/admin/plans', label: 'Paket Internet', icon: Package },
+  { href: '/admin/plans', label: 'Pakej Internet', icon: Package },
   { href: '/admin/transactions', label: 'Transaksi', icon: Receipt },
   { href: '/admin/vouchers', label: 'Voucher', icon: Ticket },
   { href: '/admin/maps', label: 'Geo-Maps', icon: MapPin },
   { section: 'Jaringan' },
   { href: '/admin/routers', label: 'Router MikroTik', icon: Router },
   { href: '/admin/bandwidths', label: 'Bandwidth', icon: Activity },
-  { section: 'Konten' },
-  { href: '/admin/banners', label: 'Banner Promo', icon: Package }, // Ganti icon kalau ada yg lebih cocok misal Image
+  { section: 'Kandungan' },
+  { href: '/admin/banners', label: 'Banner Promo', icon: Image },
   { href: '/admin/news', label: 'Berita & Info', icon: Bell },
   { section: 'Sistem' },
-  { href: '/admin/settings', label: 'Pengaturan', icon: Settings },
+  { href: '/admin/settings', label: 'Tetapan', icon: Settings },
 ]
 
 interface AdminLayoutProps {
@@ -48,37 +48,42 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Overlay mobile */}
+    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: '"Nunito", "Inter", system-ui, sans-serif' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+      `}</style>
+
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
           style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
-            zIndex: 49, display: 'none'
+            position: 'fixed', inset: 0, background: 'rgba(20,83,45,0.5)',
+            zIndex: 49, backdropFilter: 'blur(2px)'
           }}
           className="mobile-overlay"
         />
       )}
 
-      {/* SIDEBAR */}
+      {/* ── SIDEBAR ── */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+
         {/* Logo */}
         <div className="sidebar-logo">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
-              width: '36px', height: '36px', borderRadius: '10px',
-              background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+              width: '40px', height: '40px', borderRadius: '12px',
+              background: '#ea580c',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
+              flexShrink: 0, boxShadow: '0 4px 0 #c2410c'
             }}>
-              <Wifi size={20} color="white" />
+              <Wifi size={22} color="white" strokeWidth={3} />
             </div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: '1rem', letterSpacing: '-0.02em' }}>
-                <span className="gradient-text">NuxBill</span>
+              <div style={{ fontWeight: 900, fontSize: '1.1rem', color: 'white', letterSpacing: '-0.5px' }}>
+                Nux<span style={{ color: '#fbbf24' }}>Bill</span>
               </div>
-              <div style={{ fontSize: '0.65rem', color: '#475569' }}>Billing MikroTik</div>
+              <div style={{ fontSize: '0.65rem', color: '#4ade80', fontWeight: 700 }}>Admin Panel</div>
             </div>
           </div>
         </div>
@@ -97,93 +102,92 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
                 href={item.href}
                 className={`nav-item ${isActive ? 'active' : ''}`}
               >
-                <Icon size={16} />
+                <Icon size={16} strokeWidth={isActive ? 3 : 2} />
                 <span>{item.label}</span>
-                {isActive && <ChevronRight size={14} style={{ marginLeft: 'auto', opacity: 0.6 }} />}
+                {isActive && <ChevronRight size={14} style={{ marginLeft: 'auto', opacity: 0.8 }} />}
               </Link>
             )
           })}
         </nav>
 
         {/* User info + logout */}
-        <div style={{ padding: '12px 8px', borderTop: '1px solid #1e2d45' }}>
+        <div style={{ padding: '12px 8px', borderTop: '2px solid #166534' }}>
           <div style={{
-            display: 'flex', alignItems: 'center', gap: '8px',
-            padding: '10px 12px', borderRadius: '8px',
-            background: 'rgba(255,255,255,0.03)',
-            marginBottom: '4px',
+            display: 'flex', alignItems: 'center', gap: '10px',
+            padding: '10px 12px', borderRadius: '10px',
+            background: 'rgba(255,255,255,0.08)',
+            marginBottom: '6px',
           }}>
             <div style={{
-              width: '32px', height: '32px', borderRadius: '50%',
-              background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+              width: '34px', height: '34px', borderRadius: '50%',
+              background: '#ea580c',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0, fontSize: '0.75rem', fontWeight: 700, color: 'white',
+              flexShrink: 0, fontSize: '0.85rem', fontWeight: 900, color: 'white',
+              boxShadow: '0 2px 0 #c2410c'
             }}>
-              {user?.fullname?.[0] || 'A'}
+              {user?.fullname?.[0]?.toUpperCase() || 'A'}
             </div>
             <div style={{ overflow: 'hidden' }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#e2e8f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {user?.fullname || 'Admin'}
               </div>
-              <div style={{ fontSize: '0.65rem', color: '#64748b' }}>{user?.user_type || 'SuperAdmin'}</div>
+              <div style={{ fontSize: '0.65rem', color: '#4ade80', fontWeight: 700 }}>{user?.user_type || 'SuperAdmin'}</div>
             </div>
           </div>
           <button
             onClick={handleLogout}
             className="nav-item"
-            style={{ color: '#ef4444', width: '100%' }}
+            style={{ color: '#fca5a5', width: '100%' }}
             disabled={loggingOut}
           >
             <LogOut size={16} />
-            <span>{loggingOut ? 'Keluar...' : 'Logout'}</span>
+            <span>{loggingOut ? 'Keluar...' : 'Log Keluar'}</span>
           </button>
         </div>
       </aside>
 
-      {/* MAIN */}
+      {/* ── MAIN CONTENT ── */}
       <div className="main-content" style={{ flex: 1 }}>
+
         {/* Topbar */}
         <header className="topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex' }}
               className="mobile-menu-btn"
             >
-              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              {sidebarOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
             </button>
             <div>
-              <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Admin Panel</span>
+              <span style={{ fontSize: '0.875rem', color: '#94a3b8', fontWeight: 700 }}>Admin Panel</span>
             </div>
           </div>
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Link
-              href="/beli"
+              href="/"
               target="_blank"
               style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '6px 12px', borderRadius: '8px',
-                background: 'rgba(16,185,129,0.1)', color: '#10b981',
-                border: '1px solid rgba(16,185,129,0.2)',
-                fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none',
+                padding: '7px 14px', borderRadius: '8px',
+                background: 'rgba(22,163,74,0.12)', color: '#4ade80',
+                border: '1px solid rgba(22,163,74,0.25)',
+                fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none',
+                transition: 'all 0.2s'
               }}
             >
-              <Wifi size={14} /> Lihat Storefront
+              <Wifi size={14} strokeWidth={2.5} /> Laman Web
             </Link>
-            <button style={{
-              background: 'rgba(255,255,255,0.05)', border: '1px solid #334155',
-              borderRadius: '8px', padding: '6px', cursor: 'pointer', color: '#94a3b8',
-              display: 'flex', alignItems: 'center',
-            }}>
-              <Bell size={16} />
-            </button>
+
             <div style={{
-              width: '32px', height: '32px', borderRadius: '50%',
-              background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+              width: '34px', height: '34px', borderRadius: '50%',
+              background: '#16a34a',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.8rem', fontWeight: 700, color: 'white', cursor: 'pointer',
+              fontSize: '0.8rem', fontWeight: 900, color: 'white', cursor: 'pointer',
+              boxShadow: '0 3px 0 #15803d'
             }}>
-              <User size={14} />
+              <User size={16} />
             </div>
           </div>
         </header>

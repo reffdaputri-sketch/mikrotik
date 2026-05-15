@@ -61,7 +61,7 @@ export default function RoutersPage() {
       name: r.name,
       ip_address: r.ip_address,
       username: r.username,
-      password: '', // Password not returned for security
+      password: '', // Password tidak dipaparkan untuk keselamatan
       description: r.description || '',
       enabled: r.enabled,
     })
@@ -91,7 +91,7 @@ export default function RoutersPage() {
   }
 
   async function handleDelete(id: number) {
-    if (!confirm('Hapus router ini? Semua data terkait (paket, voucher) mungkin terpengaruh.')) return
+    if (!confirm('Padam router ini? Semua data berkaitan (pakej, baucar) mungkin terjejas.')) return
     try {
       await fetch(`/api/admin/routers/${id}`, { method: 'DELETE' })
       fetchRouters()
@@ -110,7 +110,7 @@ export default function RoutersPage() {
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 className="page-title">Router MikroTik</h1>
-          <p className="page-subtitle">{routers.length} router terdaftar dalam sistem</p>
+          <p className="page-subtitle">{routers.length} router berdaftar dalam sistem</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={fetchRouters} className="btn btn-secondary btn-sm"><RefreshCw size={14} /></button>
@@ -121,11 +121,11 @@ export default function RoutersPage() {
       </div>
 
       {/* Info Box */}
-      <div className="glass-card" style={{ padding: '16px', marginBottom: '24px', borderLeft: '4px solid #3b82f6' }}>
+      <div className="glass-card" style={{ padding: '16px', marginBottom: '24px', borderLeft: '4px solid #4ade80' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Activity size={20} style={{ color: '#3b82f6' }} />
+          <Activity size={20} style={{ color: '#4ade80' }} />
           <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5 }}>
-            Pastikan <strong>Local Agent</strong> sudah terinstall dan berjalan di jaringan lokal router ini agar perintah dapat dieksekusi secara otomatis.
+            Pastikan <strong>Ejen Tempatan (Local Agent)</strong> telah dipasang dan sedang berjalan di rangkaian tempatan router ini supaya arahan dapat dilaksanakan secara automatik.
           </p>
         </div>
       </div>
@@ -138,8 +138,8 @@ export default function RoutersPage() {
 
       {/* Grid of Routers */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
-        {loading && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#475569' }}>Loading routers...</div>}
-        {!loading && filtered.length === 0 && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#475569' }}>Belum ada router terdaftar</div>}
+        {loading && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#475569' }}>Memuatkan router...</div>}
+        {!loading && filtered.length === 0 && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#475569' }}>Tiada router berdaftar lagi</div>}
         
         {filtered.map(r => (
           <div key={r.id} className="glass-card" style={{ padding: '20px', position: 'relative' }}>
@@ -147,10 +147,10 @@ export default function RoutersPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ 
                   width: '40px', height: '40px', borderRadius: '10px', 
-                  background: r.status === 'Online' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                  background: r.status === 'Online' ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
-                  <Router size={20} color={r.status === 'Online' ? '#10b981' : '#ef4444'} />
+                  <Router size={20} color={r.status === 'Online' ? '#4ade80' : '#ef4444'} />
                 </div>
                 <div>
                   <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#f1f5f9' }}>{r.name}</h3>
@@ -166,12 +166,12 @@ export default function RoutersPage() {
 
             <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '8px', padding: '12px', marginBottom: '16px', fontSize: '0.8rem', color: '#94a3b8' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span>Username:</span>
+                <span>Nama Pengguna:</span>
                 <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{r.username}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Terakhir Terlihat:</span>
-                <span style={{ color: '#e2e8f0' }}>{r.last_seen ? timeAgo(r.last_seen) : 'Belum pernah'}</span>
+                <span>Terakhir Dilihat:</span>
+                <span style={{ color: '#e2e8f0' }}>{r.last_seen ? timeAgo(r.last_seen) : 'Tiada rekod'}</span>
               </div>
             </div>
 
@@ -198,33 +198,33 @@ export default function RoutersPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>{editRouter ? 'Edit Router' : 'Tambah Router Baru'}</h3>
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>{editRouter ? 'Edit Router' : 'Tambah Router Baharu'}</h3>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
             </div>
             <form onSubmit={handleSave}>
               <div className="modal-body" style={{ display: 'grid', gap: '14px' }}>
                 <div>
                   <label className="form-label">Nama Router *</label>
-                  <input className="form-input" placeholder="Contoh: Router Pusat" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                  <input className="form-input" placeholder="Contoh: Router Utama" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
                 </div>
                 <div>
                   <label className="form-label">IP Address / Hostname *</label>
                   <input className="form-input" placeholder="192.168.88.1" value={form.ip_address} onChange={e => setForm({ ...form, ip_address: e.target.value })} required />
-                  <p style={{ fontSize: '0.65rem', color: '#475569', marginTop: '4px' }}>Gunakan IP lokal yang bisa diakses oleh Local Agent</p>
+                  <p style={{ fontSize: '0.65rem', color: '#475569', marginTop: '4px' }}>Gunakan IP tempatan yang boleh dicapai oleh Ejen Tempatan</p>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <label className="form-label">RouterOS API User *</label>
+                    <label className="form-label">User API RouterOS *</label>
                     <input className="form-input" placeholder="admin" value={form.username} onChange={e => setForm({ ...form, username: e.target.value })} required />
                   </div>
                   <div>
-                    <label className="form-label">RouterOS API Password</label>
+                    <label className="form-label">Kata Laluan API</label>
                     <input type="password" className="form-input" placeholder="••••••••" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required={!editRouter} />
                   </div>
                 </div>
                 <div>
                   <label className="form-label">Keterangan / Lokasi</label>
-                  <textarea className="form-input" rows={2} placeholder="Misal: Lantai 2, Dekat Server" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+                  <textarea className="form-input" rows={2} placeholder="Contoh: Aras 1, Bilik Server" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
                 </div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', color: '#94a3b8' }}>
                   <input type="checkbox" checked={form.enabled} onChange={e => setForm({ ...form, enabled: e.target.checked })} />

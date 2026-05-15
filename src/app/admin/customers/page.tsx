@@ -95,16 +95,16 @@ export default function CustomersPage() {
   }
 
   async function handleRenew(c: Customer) {
-    if (!confirm(`Perpanjang masa aktif ${c.fullname} selama 1 bulan?`)) return
+    if (!confirm(`Lanjutkan tempoh aktif ${c.fullname} selama 1 bulan?`)) return
     
     setLoading(true)
     const res = await fetch(`/api/admin/customers/${c.id}/renew`, { method: 'POST' })
     const data = await res.json()
     if (res.ok) {
-      alert('Masa aktif berhasil diperpanjang!')
+      alert('Tempoh aktif berjaya dilanjutkan!')
       fetchCustomers()
     } else {
-      alert('Gagal: ' + (data.error || 'Terjadi kesalahan sistem'))
+      alert('Gagal: ' + (data.error || 'Ralat sistem'))
     }
     setLoading(false)
   }
@@ -119,8 +119,8 @@ export default function CustomersPage() {
     <div className="page-content">
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 className="page-title">Daftar Pelanggan</h1>
-          <p className="page-subtitle">{customers.length} pelanggan terdaftar</p>
+          <h1 className="page-title">Senarai Pelanggan</h1>
+          <p className="page-subtitle">{customers.length} pelanggan berdaftar</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={fetchCustomers} className="btn btn-secondary btn-sm"><RefreshCw size={14} /></button>
@@ -132,7 +132,7 @@ export default function CustomersPage() {
 
       <div style={{ position: 'relative', maxWidth: '320px', marginBottom: '20px' }}>
         <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#475569' }} />
-        <input className="form-input" style={{ paddingLeft: '36px' }} placeholder="Cari nama, username, atau HP..." value={search} onChange={e => setSearch(e.target.value)} />
+        <input className="form-input" style={{ paddingLeft: '36px' }} placeholder="Cari nama, username, atau nombor telefon..." value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
       <div className="glass-card">
@@ -141,17 +141,17 @@ export default function CustomersPage() {
             <thead>
               <tr>
                 <th>Pelanggan</th>
-                <th>Kontak</th>
-                <th>Tipe</th>
-                <th>Saldo</th>
+                <th>Hubungi</th>
+                <th>Jenis</th>
+                <th>Baki</th>
                 <th>Status</th>
-                <th>Masa Aktif</th>
-                <th>Aksi</th>
+                <th>Tempoh Aktif</th>
+                <th>Tindakan</th>
               </tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Loading...</td></tr>}
-              {!loading && filtered.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Belum ada pelanggan</td></tr>}
+              {loading && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Memuatkan...</td></tr>}
+              {!loading && filtered.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Tiada pelanggan dijumpai</td></tr>}
               {filtered.map(c => (
                 <tr key={c.id}>
                   <td>
@@ -199,7 +199,7 @@ export default function CustomersPage() {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '6px' }}>
-                      <button onClick={() => handleRenew(c)} title="Perpanjang 1 Bulan" className="btn btn-primary btn-sm" style={{ padding: '5px 8px', background: '#10b981' }}>
+                      <button onClick={() => handleRenew(c)} title="Lanjutkan 1 Bulan" className="btn btn-primary btn-sm" style={{ padding: '5px 8px', background: '#16a34a' }}>
                         <RefreshCw size={13} />
                       </button>
                       <button onClick={() => openEdit(c)} className="btn btn-secondary btn-sm" style={{ padding: '5px 8px' }}><Edit2 size={13} /></button>
@@ -218,7 +218,7 @@ export default function CustomersPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Tambah Pelanggan Baru</h3>
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>{editCustomer ? 'Edit Pelanggan' : 'Tambah Pelanggan Baharu'}</h3>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
             </div>
             <form onSubmit={handleSave}>
@@ -234,13 +234,13 @@ export default function CustomersPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="form-label">Nama Lengkap *</label>
-                  <input className="form-input" placeholder="John Doe" value={form.fullname} onChange={e => setForm({ ...form, fullname: e.target.value })} required />
+                  <label className="form-label">Nama Penuh *</label>
+                  <input className="form-input" placeholder="Ahmad bin Ali" value={form.fullname} onChange={e => setForm({ ...form, fullname: e.target.value })} required />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <label className="form-label">Nomor WhatsApp</label>
-                    <input className="form-input" placeholder="08123456789" value={form.phonenumber} onChange={e => setForm({ ...form, phonenumber: e.target.value })} />
+                    <label className="form-label">Nombor WhatsApp</label>
+                    <input className="form-input" placeholder="0123456789" value={form.phonenumber} onChange={e => setForm({ ...form, phonenumber: e.target.value })} />
                   </div>
                   <div>
                     <label className="form-label">Email</label>
@@ -271,26 +271,26 @@ export default function CustomersPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <label className="form-label">Tipe Layanan</label>
+                    <label className="form-label">Jenis Perkhidmatan</label>
                     <select className="form-input" value={form.service_type} onChange={e => setForm({ ...form, service_type: e.target.value })}>
                       <option value="Hotspot">Hotspot</option>
                       <option value="PPPoE">PPPoE</option>
-                      <option value="Others">Lainnya</option>
+                      <option value="Others">Lain-lain</option>
                     </select>
                   </div>
                   <div>
                     <label className="form-label">Status</label>
                     <select className="form-input" value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
                       <option value="Active">Aktif</option>
-                      <option value="Inactive">Nonaktif</option>
-                      <option value="Banned">Banned</option>
+                      <option value="Inactive">Tidak Aktif</option>
+                      <option value="Banned">Disekat</option>
                     </select>
                   </div>
                 </div>
                 {form.service_type === 'PPPoE' && (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', background: 'rgba(59,130,246,0.05)', padding: '12px', borderRadius: '8px' }}>
                     <div style={{ gridColumn: 'span 2' }}>
-                      <label className="form-label">Pilih Paket PPPoE</label>
+                      <label className="form-label">Pilih Pakej PPPoE</label>
                       <select className="form-input" value={form.plan_id} onChange={e => {
                         const plan = plans.find(p => p.id === parseInt(e.target.value))
                         const exp = new Date()
@@ -300,7 +300,7 @@ export default function CustomersPage() {
                         }
                         setForm({ ...form, plan_id: e.target.value, expired_at: exp.toISOString().split('T')[0] })
                       }}>
-                        <option value="">-- Pilih Paket --</option>
+                        <option value="">-- Pilih Pakej --</option>
                         {plans.map(p => <option key={p.id} value={p.id}>{p.name_plan} ({formatCurrency(p.price)})</option>)}
                       </select>
                     </div>
@@ -312,7 +312,7 @@ export default function CustomersPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="form-label">Masa Aktif (Expired)</label>
+                      <label className="form-label">Tempoh Aktif (Tamat)</label>
                       <input type="date" className="form-input" value={form.expired_at} onChange={e => setForm({ ...form, expired_at: e.target.value })} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '10px' }}>
@@ -415,8 +415,8 @@ function LocationPickerModal({ initialValue, onSelect, onClose }: { initialValue
         <div style={{ flex: 1, position: 'relative', background: '#0f172a' }}>
           <div id="picker-map" style={{ height: '100%', width: '100%' }}></div>
           <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 1000, pointerEvents: 'none' }}>
-            <div style={{ background: 'rgba(15,23,42,0.9)', padding: '8px 16px', borderRadius: '20px', color: 'white', fontSize: '12px', border: '1px solid #3b82f6' }}>
-              Klik pada peta atau geser pin untuk menentukan lokasi
+            <div style={{ background: 'rgba(15,23,42,0.9)', padding: '8px 16px', borderRadius: '20px', color: 'white', fontSize: '12px', border: '1px solid #16a34a' }}>
+              Klik pada peta atau geser pin untuk tentukan lokasi
             </div>
           </div>
         </div>

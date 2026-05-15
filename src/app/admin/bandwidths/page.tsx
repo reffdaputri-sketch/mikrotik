@@ -74,7 +74,7 @@ export default function BandwidthsPage() {
   }
 
   async function handleDelete(id: number) {
-    if (!confirm('Hapus bandwidth ini?')) return
+    if (!confirm('Padam profil bandwidth ini?')) return
     await fetch(`/api/admin/bandwidths/${id}`, { method: 'DELETE' })
     fetchBandwidths()
   }
@@ -88,7 +88,7 @@ export default function BandwidthsPage() {
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 className="page-title">Profil Bandwidth</h1>
-          <p className="page-subtitle">{bandwidths.length} profil terdaftar</p>
+          <p className="page-subtitle">{bandwidths.length} profil berdaftar</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={fetchBandwidths} className="btn btn-secondary btn-sm"><RefreshCw size={14} /></button>
@@ -109,24 +109,24 @@ export default function BandwidthsPage() {
             <thead>
               <tr>
                 <th>Nama Profil</th>
-                <th>Download</th>
-                <th>Upload</th>
-                <th>Aksi</th>
+                <th>Muat Turun (Download)</th>
+                <th>Muat Naik (Upload)</th>
+                <th>Tindakan</th>
               </tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Loading...</td></tr>}
-              {!loading && filtered.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Belum ada profil bandwidth</td></tr>}
+              {loading && <tr><td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Memuatkan...</td></tr>}
+              {!loading && filtered.length === 0 && <tr><td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Tiada profil bandwidth lagi</td></tr>}
               {filtered.map(b => (
                 <tr key={b.id}>
                   <td style={{ fontWeight: 600, color: '#f1f5f9' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Activity size={14} style={{ color: '#10b981' }} />
+                      <Activity size={14} style={{ color: '#4ade80' }} />
                       {b.name_bw}
                     </div>
                   </td>
-                  <td style={{ color: '#3b82f6', fontWeight: 600 }}>{b.rate_down} {b.rate_down_unit}</td>
-                  <td style={{ color: '#8b5cf6', fontWeight: 600 }}>{b.rate_up} {b.rate_up_unit}</td>
+                  <td style={{ color: '#60a5fa', fontWeight: 600 }}>{b.rate_down} {b.rate_down_unit}</td>
+                  <td style={{ color: '#a78bfa', fontWeight: 600 }}>{b.rate_up} {b.rate_up_unit}</td>
                   <td>
                     <div style={{ display: 'flex', gap: '6px' }}>
                       <button onClick={() => openEdit(b)} className="btn btn-secondary btn-sm" style={{ padding: '5px 8px' }}><Edit2 size={13} /></button>
@@ -156,11 +156,11 @@ export default function BandwidthsPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <label className="form-label">Rate Download *</label>
+                    <label className="form-label">Kadar Muat Turun *</label>
                     <input type="number" className="form-input" placeholder="5" value={form.rate_down} onChange={e => setForm({ ...form, rate_down: e.target.value })} required />
                   </div>
                   <div>
-                    <label className="form-label">Satuan</label>
+                    <label className="form-label">Unit</label>
                     <select className="form-input" value={form.rate_down_unit} onChange={e => setForm({ ...form, rate_down_unit: e.target.value })}>
                       <option value="Kbps">Kbps</option>
                       <option value="Mbps">Mbps</option>
@@ -169,11 +169,11 @@ export default function BandwidthsPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <label className="form-label">Rate Upload *</label>
+                    <label className="form-label">Kadar Muat Naik *</label>
                     <input type="number" className="form-input" placeholder="5" value={form.rate_up} onChange={e => setForm({ ...form, rate_up: e.target.value })} required />
                   </div>
                   <div>
-                    <label className="form-label">Satuan</label>
+                    <label className="form-label">Unit</label>
                     <select className="form-input" value={form.rate_up_unit} onChange={e => setForm({ ...form, rate_up_unit: e.target.value })}>
                       <option value="Kbps">Kbps</option>
                       <option value="Mbps">Mbps</option>

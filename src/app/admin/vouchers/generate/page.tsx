@@ -35,7 +35,7 @@ export default function GenerateVoucherPage() {
         body: JSON.stringify(form),
       })
       if (res.ok) {
-        alert('Voucher berhasil digenerate!')
+        alert('Baucar berjaya dijana!')
         router.push('/admin/vouchers')
       }
     } catch (err) {
@@ -52,8 +52,8 @@ export default function GenerateVoucherPage() {
           <ArrowLeft size={16} />
         </button>
         <div>
-          <h1 className="page-title">Generate Voucher Masal</h1>
-          <p className="page-subtitle">Buat ribuan voucher sekaligus untuk stok fisik</p>
+          <h1 className="page-title">Jana Baucar Pukal</h1>
+          <p className="page-subtitle">Cipta ribuan baucar sekaligus untuk stok fizikal</p>
         </div>
       </div>
 
@@ -61,20 +61,20 @@ export default function GenerateVoucherPage() {
         <div className="glass-card" style={{ padding: '24px' }}>
           <form onSubmit={handleGenerate} style={{ display: 'grid', gap: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
-              <Zap size={20} color="#f59e0b" />
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Konfigurasi Voucher</h3>
+              <Zap size={20} color="#fbbf24" />
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Konfigurasi Baucar</h3>
             </div>
 
             <div>
-              <label className="form-label">Pilih Paket Internet *</label>
+              <label className="form-label">Pilih Pakej Internet *</label>
               <select className="form-input" value={form.plan_id} onChange={e => setForm({...form, plan_id: e.target.value})} required>
-                <option value="">-- Pilih Paket --</option>
+                <option value="">-- Pilih Pakej --</option>
                 {plans.map(p => <option key={p.id} value={p.id}>{p.name_plan} ({p.type})</option>)}
               </select>
             </div>
 
             <div>
-              <label className="form-label">Router (Opsional)</label>
+              <label className="form-label">Router (Pilihan)</label>
               <select className="form-input" value={form.router_id} onChange={e => setForm({...form, router_id: e.target.value})}>
                 <option value="">-- Semua Router --</option>
                 {routers.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
@@ -83,11 +83,11 @@ export default function GenerateVoucherPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label className="form-label">Jumlah Voucher</label>
+                <label className="form-label">Bilangan Baucar</label>
                 <input type="number" className="form-input" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})} min="1" max="1000" />
               </div>
               <div>
-                <label className="form-label">Tipe Login</label>
+                <label className="form-label">Jenis Log Masuk</label>
                 <select className="form-input" value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
                   <option value="Hotspot">Hotspot</option>
                   <option value="PPPOE">PPPoE</option>
@@ -97,26 +97,26 @@ export default function GenerateVoucherPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label className="form-label">Panjang Kode</label>
+                <label className="form-label">Panjang Kod</label>
                 <input type="number" className="form-input" value={form.length} onChange={e => setForm({...form, length: e.target.value})} min="4" max="16" />
               </div>
               <div>
-                <label className="form-label">Karakter</label>
+                <label className="form-label">Jenis Karakter</label>
                 <select className="form-input" value={form.char_type} onChange={e => setForm({...form, char_type: e.target.value})}>
-                  <option value="ALPHANUMERIC">Huruf & Angka</option>
+                  <option value="ALPHANUMERIC">Huruf & Nombor</option>
                   <option value="UPPERCASE">Hanya Huruf Besar</option>
-                  <option value="NUMERIC">Hanya Angka</option>
+                  <option value="NUMERIC">Hanya Nombor</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="form-label">Awalan Kode (Prefix)</label>
-              <input className="form-input" placeholder="Misal: WI-" value={form.prefix} onChange={e => setForm({...form, prefix: e.target.value})} />
+              <label className="form-label">Awalan Kod (Prefix)</label>
+              <input className="form-input" placeholder="Contoh: WI-" value={form.prefix} onChange={e => setForm({...form, prefix: e.target.value})} />
             </div>
 
             <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', padding: '12px' }}>
-              {loading ? <><RefreshCw size={18} className="animate-spin" style={{marginRight: '8px'}}/> Menghasilkan...</> : <><Ticket size={18} style={{marginRight: '8px'}}/> Generate Sekarang</>}
+              {loading ? <><RefreshCw size={18} className="animate-spin" style={{marginRight: '8px'}}/> Menjana...</> : <><Ticket size={18} style={{marginRight: '8px'}}/> Jana Sekarang</>}
             </button>
           </form>
         </div>
@@ -124,21 +124,21 @@ export default function GenerateVoucherPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div className="glass-card" style={{ padding: '24px' }}>
              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <Info size={20} color="#3b82f6" />
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Tips & Info</h3>
+              <Info size={20} color="#60a5fa" />
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Tips & Maklumat</h3>
             </div>
             <ul style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: '1.6', display: 'grid', gap: '12px' }}>
-              <li>• Voucher yang digenerate akan berstatus <strong>unused</strong> (belum terpakai).</li>
-              <li>• Gunakan <strong>Prefix</strong> untuk membedakan stok voucher antar sales atau lokasi.</li>
-              <li>• Jika <strong>Router</strong> tidak dipilih, voucher bisa digunakan di router mana saja yang memiliki paket dengan nama yang sama.</li>
-              <li>• Kode voucher akan digenerate secara acak untuk menghindari penebakan oleh user jahat.</li>
+              <li>• Baucar yang dijana akan berstatus <strong>unused</strong> (belum digunakan).</li>
+              <li>• Gunakan <strong>Prefix</strong> untuk membezakan stok baucar antara jurujual atau lokasi.</li>
+              <li>• Jika <strong>Router</strong> tidak dipilih, baucar boleh digunakan di mana-mana router yang mempunyai pakej dengan nama yang sama.</li>
+              <li>• Kod baucar akan dijana secara rawak untuk mengelakkan percubaan tekaan oleh pengguna.</li>
             </ul>
           </div>
 
-          <div className="glass-card" style={{ padding: '24px', borderLeft: '4px solid #10b981' }}>
-            <h4 style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: '8px' }}>Estimasi Selesai</h4>
+          <div className="glass-card" style={{ padding: '24px', borderLeft: '4px solid #4ade80' }}>
+            <h4 style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: '8px' }}>Anggaran Selesai</h4>
             <p style={{ color: '#64748b', fontSize: '0.8rem' }}>
-              Sistem kami mampu menghasilkan 1000 voucher dalam waktu kurang dari 2 detik.
+              Sistem kami mampu menjana 1000 baucar dalam masa kurang dari 2 saat.
             </p>
           </div>
         </div>

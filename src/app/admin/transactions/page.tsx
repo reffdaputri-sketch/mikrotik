@@ -101,8 +101,8 @@ export default function TransactionsPage() {
 
       <div className="page-header no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 className="page-title">Riwayat & Laporan</h1>
-          <p className="page-subtitle">Analisis omset dan riwayat transaksi</p>
+          <h1 className="page-title">Sejarah & Laporan</h1>
+          <p className="page-subtitle">Analisis hasil dan sejarah transaksi</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={handlePrint} className="btn btn-secondary btn-sm" title="Cetak Laporan">
@@ -120,7 +120,7 @@ export default function TransactionsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Calendar size={14} color="#64748b" />
           <select className="form-input" style={{ width: 'auto', padding: '6px 12px' }} value={dateRange} onChange={e => setDateRange(e.target.value)}>
-            <option value="all">Semua Waktu</option>
+            <option value="all">Semua Masa</option>
             <option value="today">Hari Ini</option>
             <option value="month">Bulan Ini</option>
             <option value="year">Tahun Ini</option>
@@ -130,38 +130,38 @@ export default function TransactionsPage() {
           <Filter size={14} color="#64748b" />
           <select className="form-input" style={{ width: 'auto', padding: '6px 12px' }} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             <option value="all">Semua Status</option>
-            <option value="paid">Terbayar</option>
+            <option value="paid">Dibayar</option>
             <option value="pending">Menunggu</option>
-            <option value="expired">Expired</option>
+            <option value="expired">Tamat Tempoh</option>
           </select>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-        <div className="glass-card omset-card" style={{ padding: '20px', background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05))', borderLeft: '4px solid #10b981' }}>
+        <div className="glass-card omset-card" style={{ padding: '20px', background: 'linear-gradient(135deg, rgba(74,222,128,0.1), rgba(74,222,128,0.05))', borderLeft: '4px solid #4ade80' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Omset ({dateRange.toUpperCase()})</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#10b981', marginTop: '4px' }}>{formatCurrency(totalOmset)}</div>
+              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Hasil ({dateRange.toUpperCase()})</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#4ade80', marginTop: '4px' }}>{formatCurrency(totalOmset)}</div>
             </div>
-            <div style={{ padding: '10px', background: 'rgba(16,185,129,0.2)', borderRadius: '12px' }}>
-              <CreditCard size={24} color="#10b981" />
+            <div style={{ padding: '10px', background: 'rgba(74,222,128,0.2)', borderRadius: '12px' }}>
+              <CreditCard size={24} color="#4ade80" />
             </div>
           </div>
           <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '12px' }}>
-            Dari {filtered.filter(t => t.status === 'paid').length} transaksi berhasil
+            Dari {filtered.filter(t => t.status === 'paid').length} transaksi berjaya
           </div>
         </div>
 
-        <div className="glass-card no-print" style={{ padding: '20px', borderLeft: '4px solid #f59e0b' }}>
+        <div className="glass-card no-print" style={{ padding: '20px', borderLeft: '4px solid #fbbf24' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Menunggu</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#f59e0b', marginTop: '4px' }}>{filtered.filter(t => t.status === 'pending').length}</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#fbbf24', marginTop: '4px' }}>{filtered.filter(t => t.status === 'pending').length}</div>
             </div>
-            <div style={{ padding: '10px', background: 'rgba(245,158,11,0.2)', borderRadius: '12px' }}>
-              <Clock size={24} color="#f59e0b" />
+            <div style={{ padding: '10px', background: 'rgba(251,191,36,0.2)', borderRadius: '12px' }}>
+              <Clock size={24} color="#fbbf24" />
             </div>
           </div>
           <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '12px' }}>
@@ -173,28 +173,28 @@ export default function TransactionsPage() {
       <div className="glass-card">
         <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Data Transaksi</h3>
-          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Showing {filtered.length} entries</span>
+          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Memaparkan {filtered.length} rekod</span>
         </div>
         <div className="table-wrapper">
           <table className="data-table">
             <thead>
               <tr>
-                <th>Invoice</th>
-                <th>Tanggal</th>
+                <th>Invois</th>
+                <th>Tarikh</th>
                 <th>Pelanggan</th>
-                <th>Layanan</th>
-                <th>Metode</th>
-                <th>Total</th>
+                <th>Perkhidmatan</th>
+                <th>Kaedah</th>
+                <th>Jumlah</th>
                 <th className="no-print">Status</th>
               </tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Loading...</td></tr>}
+              {loading && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Memuatkan...</td></tr>}
               {!loading && filtered.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>Data kosong</td></tr>}
               {filtered.map(t => (
                 <tr key={t.id}>
                   <td style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '0.8rem', fontFamily: 'monospace' }}>#{t.order_id.slice(-8).toUpperCase()}</td>
-                  <td style={{ fontSize: '0.8rem' }}>{new Date(t.created_at).toLocaleDateString('id-ID')}</td>
+                  <td style={{ fontSize: '0.8rem' }}>{new Date(t.created_at).toLocaleDateString('ms-MY')}</td>
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <span style={{ fontWeight: 600, color: '#cbd5e1', fontSize: '0.85rem' }}>{t.customer_name}</span>
@@ -202,24 +202,24 @@ export default function TransactionsPage() {
                   </td>
                   <td><span style={{ fontSize: '0.85rem' }}>{t.plan_name}</span></td>
                   <td><span style={{ fontSize: '0.75rem', color: '#64748b' }}>{t.payment_type || 'Manual'}</span></td>
-                  <td style={{ fontWeight: 800, color: t.status === 'paid' ? '#10b981' : '#f59e0b' }}>{formatCurrency(t.price)}</td>
+                  <td style={{ fontWeight: 800, color: t.status === 'paid' ? '#4ade80' : '#fbbf24' }}>{formatCurrency(t.price)}</td>
                   <td className="no-print">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span className={`badge ${t.status === 'paid' ? 'badge-success' : 'badge-warning'}`}>
-                        {t.status.toUpperCase()}
+                        {t.status === 'paid' ? 'DIBAYAR' : t.status.toUpperCase()}
                       </span>
                       {t.status === 'pending' && (
                         <button 
                           onClick={async () => {
-                            if (confirm('Konfirmasi pembayaran manual ini?')) {
+                            if (confirm('Sahkan pembayaran manual ini?')) {
                               const res = await fetch(`/api/admin/transactions/confirm/${t.id}`, { method: 'POST' });
                               if (res.ok) fetchTransactions();
-                              else alert('Gagal konfirmasi');
+                              else alert('Gagal mengesahkan');
                             }
                           }}
                           className="btn btn-secondary btn-sm" 
-                          style={{ padding: '4px', background: 'rgba(16,185,129,0.1)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}
-                          title="Konfirmasi Manual"
+                          style={{ padding: '4px', background: 'rgba(74,222,128,0.1)', color: '#4ade80', border: '1px solid rgba(74,222,128,0.2)' }}
+                          title="Sahkan Manual"
                         >
                           <CreditCard size={12} />
                         </button>
