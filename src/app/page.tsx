@@ -123,7 +123,7 @@ export default function LandingPage() {
           {/* Brand */}
           <div style={{ textAlign: 'center', animation: 'fade-in 0.5s ease' }}>
             <div style={{ fontSize: '32px', fontWeight: 900, color: 'white', letterSpacing: '-0.5px' }}>
-              Nux<span style={{ color: '#fbbf24' }}>Bill</span>
+              Purnama <span style={{ color: '#fbbf24' }}>WiFi</span>
             </div>
             <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: '16px', fontWeight: 600, marginTop: '4px' }}>
               Sedang menyediakan pakej untuk anda...
@@ -220,7 +220,7 @@ export default function LandingPage() {
         boxSizing: 'border-box'
       }}>
         <span style={{ fontSize: '26px', fontWeight: 900, color: '#16a34a', letterSpacing: '-0.5px' }}>
-          Nux<span style={{ color: '#ea580c' }}>Bill</span>
+          Purnama <span style={{ color: '#ea580c' }}>WiFi</span>
         </span>
         <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
           <a href="#plans" className="bubbly-button" style={{ color: '#166534', fontWeight: 800, fontSize: '15px', textDecoration: 'none' }}>
@@ -311,7 +311,7 @@ export default function LandingPage() {
               }} />
               <img
                 src="/mascot.png"
-                alt="NuxBill Mascot"
+                alt="Purnama WiFi Mascot"
                 style={{
                   width: '340px', maxWidth: '90vw',
                   filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))',
@@ -480,10 +480,10 @@ export default function LandingPage() {
           <div style={{ width: '48px', height: '48px', background: 'white', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 0 #bbf7d0' }}>
             <Wifi color="#16a34a" size={26} strokeWidth={3} />
           </div>
-          <span style={{ fontSize: '26px', fontWeight: 900 }}>Nux<span style={{ color: '#fdba74' }}>Bill</span></span>
+          <span style={{ fontSize: '26px', fontWeight: 900 }}>Purnama <span style={{ color: '#fdba74' }}>WiFi</span></span>
         </div>
         <p style={{ color: '#bbf7d0', fontSize: '15px', fontWeight: 600 }}>
-          &copy; 2026 NuxBill Malaysia. Jadikan Internet Lebih Menyeronokkan!
+          &copy; 2026 Purnama WiFi Malaysia. Jadikan Internet Lebih Menyeronokkan!
         </p>
       </footer>
     </div>

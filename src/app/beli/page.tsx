@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Wifi, MapPin, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Wifi, MapPin, AlertTriangle, CheckCircle2, Copy } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function BeliVoucher() {
@@ -11,6 +11,10 @@ export default function BeliVoucher() {
   const [locError, setLocError] = useState('')
   const [buyerInfo, setBuyerInfo] = useState({ name: '', phone: '' })
   const [purchasedVoucher, setPurchasedVoucher] = useState<any>(null)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<any>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [customer, setCustomer] = useState<any>(null)
 
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371e3
@@ -27,6 +31,8 @@ export default function BeliVoucher() {
     if (saved) {
       const c = JSON.parse(saved)
       setBuyerInfo({ name: c.fullname, phone: c.phonenumber })
+      setCustomer(c)
+      setIsLoggedIn(true)
     }
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -40,30 +46,54 @@ export default function BeliVoucher() {
       .catch(() => setLoading(false))
   }, [])
 
-  async function handleBuy(planId: number) {
-    const saved = localStorage.getItem('nuxbill_customer')
-    const customer = saved ? JSON.parse(saved) : null
+  async function handleBuy(plan: any) {
     if (!buyerInfo.name || !buyerInfo.phone) {
       alert('Tolong isi Nama dan Nombor WA anda dahulu ya!')
       return
     }
+    setSelectedPlan(plan)
+    setShowPaymentModal(true)
+  }
+
+  async function processOrder(method: 'online' | 'wallet') {
+    if (!selectedPlan) return
+    
+    if (method === 'wallet' && !isLoggedIn) {
+      alert('Sila Login ke akaun pelanggan anda dahulu untuk menggunakan baki saldo!')
+      window.location.href = '/pelanggan'
+      return
+    }
+
     setLoading(true)
+    setShowPaymentModal(false)
+    
     try {
-      const res = await fetch('/api/orders/create', {
+      const endpoint = method === 'wallet' ? '/api/pelanggan/buy-voucher-wallet' : '/api/orders/create'
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan_id: planId, customer_id: customer?.id || null, name: buyerInfo.name, phone: buyerInfo.phone, email: '' })
+        body: JSON.stringify({ 
+          plan_id: selectedPlan?.id, 
+          customer_id: customer?.id || null, 
+          name: buyerInfo.name, 
+          phone: buyerInfo.phone 
+        })
       })
+      
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Gagal menyambung ke pelayan pembayaran')
+      if (!res.ok) throw new Error(data.error || 'Gagal memproses pesanan')
+
       if (data.redirect_url) {
         window.location.href = data.redirect_url
       } else {
-        setPurchasedVoucher({ username: data.voucher_code || data.username, password: data.password || data.voucher_code })
+        setPurchasedVoucher({ 
+          username: data.voucher_code || data.username, 
+          password: data.password || data.voucher_code 
+        })
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     } catch (err: any) {
-      alert(`Gagal: ${err.message}`)
+      alert(`Ralat: ${err.message}`)
     } finally {
       setLoading(false)
     }
@@ -148,6 +178,16 @@ export default function BeliVoucher() {
                 <div style={{ fontSize: '11px', fontWeight: 900, color: '#166534', textTransform: 'uppercase', letterSpacing: '1px' }}>Password</div>
                 <div style={{ fontSize: '28px', fontWeight: 900, letterSpacing: '2px', color: '#14532d' }}>{purchasedVoucher.password}</div>
               </div>
+              <button 
+                onClick={() => {
+                  const text = `User: ${purchasedVoucher.username}\nPass: ${purchasedVoucher.password}`
+                  navigator.clipboard.writeText(text)
+                  alert('Kod disalin!')
+                }}
+                style={{ marginTop: '14px', background: '#f0fdf4', border: '2px solid #16a34a', color: '#16a34a', padding: '6px 14px', borderRadius: '50px', fontSize: '12px', fontWeight: 800, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Copy size={12} /> Salin Kod
+              </button>
             </div>
             <button className="bubbly-button" onClick={() => setPurchasedVoucher(null)}
               style={{ background: '#ea580c', color: 'white', border: 'none', padding: '14px 32px', borderRadius: '50px', fontWeight: 900, fontSize: '15px', boxShadow: '0 4px 0 #c2410c' }}>
@@ -228,7 +268,7 @@ export default function BeliVoucher() {
                     </div>
                   )}
                   <button
-                    onClick={() => handleBuy(plan.id)}
+                    onClick={() => handleBuy(plan)}
                     className="bubbly-button"
                     style={{ width: '100%', padding: '14px', borderRadius: '50px', background: ac.btn, color: 'white', fontSize: '16px', fontWeight: 900, border: 'none', boxShadow: `0 5px 0 ${ac.btnShadow}` }}
                   >
@@ -246,6 +286,48 @@ export default function BeliVoucher() {
             &larr; Kembali ke Papan Pemuka
           </a>
         </div>
+
+        {/* Payment Selection Modal */}
+        {showPaymentModal && selectedPlan && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(20, 83, 45, 0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+            <div className="kid-card" style={{ maxWidth: '400px', width: '100%', padding: '30px', textAlign: 'center', position: 'relative' }}>
+              <button onClick={() => setShowPaymentModal(false)} style={{ position: 'absolute', right: '15px', top: '15px', background: '#f0fdf4', border: 'none', width: '36px', height: '36px', borderRadius: '50%', fontWeight: 900, color: '#16a34a', cursor: 'pointer' }}>×</button>
+              
+              <div style={{ width: '60px', height: '60px', background: '#16a34a', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', boxShadow: '0 4px 0 #15803d' }}>
+                <CheckCircle2 color="white" size={32} />
+              </div>
+              
+              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#14532d', marginBottom: '8px' }}>Pilih Cara Bayar 💰</h3>
+              <p style={{ fontSize: '14px', color: '#166534', fontWeight: 600, marginBottom: '24px' }}>
+                Anda memilih pakej <span style={{ color: '#16a34a' }}>{selectedPlan?.name_plan}</span> seharga <span style={{ fontWeight: 800 }}>{formatCurrency(selectedPlan?.price || 0)}</span>
+              </p>
+              
+              <div style={{ display: 'grid', gap: '12px' }}>
+                <button onClick={() => processOrder('online')} className="bubbly-button" style={{ width: '100%', padding: '16px', borderRadius: '50px', background: '#16a34a', color: 'white', fontWeight: 900, border: 'none', boxShadow: '0 4px 0 #15803d' }}>
+                  QRIS / Online Banking 💳
+                </button>
+                
+                <button 
+                  onClick={() => processOrder('wallet')} 
+                  className="bubbly-button" 
+                  style={{ 
+                    width: '100%', padding: '16px', borderRadius: '50px', 
+                    background: isLoggedIn ? '#ea580c' : '#f1f5f9', 
+                    color: isLoggedIn ? 'white' : '#94a3b8', 
+                    fontWeight: 900, border: 'none', 
+                    boxShadow: isLoggedIn ? '0 4px 0 #c2410c' : 'none' 
+                  }}
+                >
+                  {isLoggedIn ? 'Guna Saldo Wallet 🏦' : 'Guna Saldo (Sila Login)'}
+                </button>
+              </div>
+              
+              <p style={{ marginTop: '20px', fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                {isLoggedIn ? `Baki Saldo Anda: ${formatCurrency(customer?.balance || 0)}` : 'Anda perlu masuk ke akaun pelanggan untuk guna baki saldo.'}
+              </p>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

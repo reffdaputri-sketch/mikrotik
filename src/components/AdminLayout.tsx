@@ -15,7 +15,8 @@ const navItems = [
   { section: 'Billing' },
   { href: '/admin/customers', label: 'Pelanggan', icon: Users },
   { href: '/admin/plans', label: 'Pakej Internet', icon: Package },
-  { href: '/admin/transactions', label: 'Transaksi', icon: Receipt },
+  { href: '/admin/invoices', label: 'Invois & Bil', icon: Receipt },
+  { href: '/admin/transactions', label: 'Sejarah Transaksi', icon: Activity },
   { href: '/admin/vouchers', label: 'Voucher', icon: Ticket },
   { href: '/admin/maps', label: 'Geo-Maps', icon: MapPin },
   { section: 'Jaringan' },
@@ -81,7 +82,7 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
             </div>
             <div>
               <div style={{ fontWeight: 900, fontSize: '1.1rem', color: 'white', letterSpacing: '-0.5px' }}>
-                Nux<span style={{ color: '#fbbf24' }}>Bill</span>
+                Purnama <span style={{ color: '#fbbf24' }}>WiFi</span>
               </div>
               <div style={{ fontSize: '0.65rem', color: '#4ade80', fontWeight: 700 }}>Admin Panel</div>
             </div>

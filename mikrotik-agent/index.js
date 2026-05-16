@@ -26,6 +26,9 @@ async function getRouterConnection(router) {
     return {
       write: async (args) => {
         console.log('🧪 [SIMULATION] Executing command:', args)
+        if (args[0] && args[0].includes('print')) {
+          return [{ '.id': '*SIMULATED' }]
+        }
         return { simulated: true }
       },
       connect: async () => true
@@ -113,7 +116,10 @@ async function executeCommand(api, command, payload) {
         `?name=${payload.username}`,
       ])
       if (secrets && secrets.length > 0) {
-        await api.write(['/ppp/secret/set', `=.id=${secrets[0]['.id']}`, '=disabled=yes'])
+        const setArgs = ['/ppp/secret/set', `=.id=${secrets[0]['.id']}`, '=disabled=yes'];
+        if (payload.comment) setArgs.push(`=comment=${payload.comment}`);
+        await api.write(setArgs);
+        
         const active = await api.write([
           '/ppp/active/print',
           `?name=${payload.username}`,
@@ -136,6 +142,83 @@ async function executeCommand(api, command, payload) {
       return { enabled: true }
     }
 
+    case 'update_pppoe_secret': {
+      const secrets = await api.write(['/ppp/secret/print', `?name=${payload.username}`])
+      if (secrets && secrets.length > 0) {
+        const setArgs = ['/ppp/secret/set', `=.id=${secrets[0]['.id']}`]
+        if (payload.password) setArgs.push(`=password=${payload.password}`)
+        if (payload.profile) setArgs.push(`=profile=${payload.profile}`)
+        await api.write(setArgs)
+      }
+      return { updated: true }
+    }
+
+    case 'kick_pppoe_user': {
+      const active = await api.write(['/ppp/active/print', `?name=${payload.username}`])
+      for (const session of active || []) {
+        await api.write(['/ppp/active/remove', `=.id=${session['.id']}`])
+      }
+      return { kicked: true }
+    }
+
+    case 'disable_hotspot_user': {
+      const users = await api.write(['/ip/hotspot/user/print', `?name=${payload.username}`])
+      if (users && users.length > 0) {
+        const setArgs = ['/ip/hotspot/user/set', `=.id=${users[0]['.id']}`, '=disabled=yes']
+        if (payload.comment) setArgs.push(`=comment=${payload.comment}`)
+        await api.write(setArgs)
+        
+        const active = await api.write(['/ip/hotspot/active/print', `?user=${payload.username}`])
+        for (const session of active || []) {
+          await api.write(['/ip/hotspot/active/remove', `=.id=${session['.id']}`])
+        }
+      }
+      return { disabled: true }
+    }
+
+    case 'enable_hotspot_user': {
+      const users = await api.write(['/ip/hotspot/user/print', `?name=${payload.username}`])
+      if (users && users.length > 0) {
+        await api.write(['/ip/hotspot/user/set', `=.id=${users[0]['.id']}`, '=disabled=no'])
+      }
+      return { enabled: true }
+    }
+
+    case 'update_hotspot_user': {
+      const users = await api.write(['/ip/hotspot/user/print', `?name=${payload.username}`])
+      if (users && users.length > 0) {
+        const setArgs = ['/ip/hotspot/user/set', `=.id=${users[0]['.id']}`]
+        if (payload.password) setArgs.push(`=password=${payload.password}`)
+        if (payload.profile) setArgs.push(`=profile=${payload.profile}`)
+        await api.write(setArgs)
+      }
+      return { updated: true }
+    }
+
+    case 'sync_mikrotik_profile': {
+      if (payload.type === 'Hotspot') {
+        const profiles = await api.write(['/ip/hotspot/user-profile/print', `?name=${payload.name}`])
+        const args = [
+          (profiles && profiles.length > 0) ? '/ip/hotspot/user-profile/set' : '/ip/hotspot/user-profile/add',
+          ...(profiles && profiles.length > 0 ? [`=.id=${profiles[0]['.id']}`] : [`=name=${payload.name}`]),
+          `=rate-limit=${payload.rate_limit || ''}`,
+          '=status-autorefresh=1m',
+          '=shared-users=1'
+        ]
+        await api.write(args)
+      } else if (payload.type === 'PPPOE') {
+        const profiles = await api.write(['/ppp/profile/print', `?name=${payload.name}`])
+        const args = [
+          (profiles && profiles.length > 0) ? '/ppp/profile/set' : '/ppp/profile/add',
+          ...(profiles && profiles.length > 0 ? [`=.id=${profiles[0]['.id']}`] : [`=name=${payload.name}`]),
+          `=rate-limit=${payload.rate_limit || ''}`
+        ]
+        await api.write(args)
+      }
+      return { synced: true }
+    }
+
+    case 'kick_hotspot_user':
     case 'disconnect_hotspot_user': {
       const active = await api.write([
         '/ip/hotspot/active/print',
@@ -171,6 +254,17 @@ async function processCommands() {
     if (error) {
       console.error('❌ Supabase error:', error.message)
       return
+    }
+
+    // --- HEARTBEAT: Update status semua router jadi Online ---
+    const { data: allRouters } = await supabase.from('routers').select('id, name, ip_address, username');
+    if (allRouters) {
+      for (const r of allRouters) {
+        await supabase
+          .from('routers')
+          .update({ last_seen: new Date().toISOString(), status: 'Online' })
+          .eq('id', r.id);
+      }
     }
 
     if (!commands || commands.length === 0) return

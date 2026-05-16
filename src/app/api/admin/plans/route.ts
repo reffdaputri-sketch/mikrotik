@@ -33,5 +33,24 @@ export async function POST(request: Request) {
     is_public: body.is_public ?? true,
   }).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // --- SINKRONISASI PROFIL MIKROTIK ---
+  if (data.router_id && data.id_bw) {
+    const { data: bw } = await supabase.from('bandwidths').select('*').eq('id', data.id_bw).single()
+    if (bw) {
+      const rateLimit = `${bw.rate_up}${bw.rate_up_unit === 'Mbps' ? 'M' : 'k'}/${bw.rate_down}${bw.rate_down_unit === 'Mbps' ? 'M' : 'k'}`
+      await supabase.from('mikrotik_command_queue').insert({
+        router_id: data.router_id,
+        command: 'sync_mikrotik_profile',
+        payload: {
+          type: data.type, // Hotspot atau PPPOE
+          name: bw.name_bw,
+          rate_limit: rateLimit
+        },
+        status: 'pending',
+      })
+    }
+  }
+
   return NextResponse.json({ plan: data })
 }

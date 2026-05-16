@@ -64,7 +64,7 @@ export default function LoginPage() {
             <Wifi size={32} color="white" />
           </div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
-            <span className="gradient-text">NuxBill</span>
+            <span className="gradient-text">Purnama WiFi</span>
           </h1>
           <p style={{ color: '#64748b', fontSize: '0.875rem', marginTop: '4px' }}>
             Sistem Billing MikroTik
@@ -163,7 +163,7 @@ export default function LoginPage() {
         </div>
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: '#334155', fontSize: '0.75rem' }}>
-          © 2025 NuxBill — Powered by Next.js & Supabase
+          © 2025 Purnama WiFi — Powered by Next.js & Supabase
         </p>
       </div>
     </div>

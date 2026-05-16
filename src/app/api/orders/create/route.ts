@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       billDescription: `Purchase of ${plan.name_plan} for ${name}`,
       billAmount: parseFloat(plan.price),
       billTo: name,
-      billEmail: email || `${phone}@nuxbill.local`,
+      billEmail: email || `${phone}@purnama.local`,
       billPhone: phone,
       externalReferenceNo: orderId,
       callbackUrl: `${appUrl}/api/webhook/toyyibpay`,
@@ -163,7 +163,7 @@ async function deliverVoucherDirect(
         username: voucherUsername,
         password: voucherPassword,
         profile: (plan.bandwidths as any)?.name_bw || 'default',
-        comment: `NuxBill-Order-${order.order_id}`,
+        comment: `Purnama-Order-${order.order_id}`,
       },
       status: 'pending',
     })

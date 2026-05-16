@@ -12,7 +12,7 @@ export async function PUT(
   const supabase = await createAdminClient()
   const body = await request.json()
 
-  const { data, error } = await supabase
+  const { data: customer, error } = await supabase
     .from('customers')
     .update({
       fullname: body.fullname,
@@ -35,17 +35,52 @@ export async function PUT(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Jika status berubah jadi Active, kirim perintah Enable ke MikroTik
-  if (body.status === 'Active' && body.router_id) {
-    await supabase.from('mikrotik_command_queue').insert({
-      router_id: body.router_id,
-      command: 'enable_pppoe_secret',
-      payload: { username: body.username },
-      status: 'pending',
-    })
+  // --- SINKRONISASI MIKROTIK ---
+  if (body.router_id) {
+    // 1. Jika status berubah
+    if (body.status === 'Active') {
+      await supabase.from('mikrotik_command_queue').insert({
+        router_id: body.router_id,
+        command: customer.service_type === 'PPPoE' ? 'enable_pppoe_secret' : 'enable_hotspot_user',
+        payload: { username: body.username },
+        status: 'pending',
+      })
+    } else if (body.status === 'Disabled' || body.status === 'Banned') {
+      await supabase.from('mikrotik_command_queue').insert({
+        router_id: body.router_id,
+        command: customer.service_type === 'PPPoE' ? 'disable_pppoe_secret' : 'disable_hotspot_user',
+        payload: { username: body.username },
+        status: 'pending',
+      })
+    }
+
+    // 2. Jika Paket (Plan) atau Password berubah
+    if (body.plan_id || body.password) {
+      // Ambil nama plan untuk dijadikan nama profile di MikroTik
+      const { data: plan } = await supabase.from('plans').select('name_plan').eq('id', body.plan_id).single()
+      
+      await supabase.from('mikrotik_command_queue').insert({
+        router_id: body.router_id,
+        command: customer.service_type === 'PPPoE' ? 'update_pppoe_secret' : 'update_hotspot_user',
+        payload: { 
+          username: body.username,
+          password: body.password || undefined,
+          profile: plan?.name_plan || undefined
+        },
+        status: 'pending',
+      })
+
+      // Kick user agar profil baru (speed) segera aktif
+      await supabase.from('mikrotik_command_queue').insert({
+        router_id: body.router_id,
+        command: customer.service_type === 'PPPoE' ? 'kick_pppoe_user' : 'kick_hotspot_user',
+        payload: { username: body.username },
+        status: 'pending',
+      })
+    }
   }
 
-  return NextResponse.json({ customer: data })
+  return NextResponse.json({ customer })
 }
 
 export async function DELETE(
@@ -56,6 +91,25 @@ export async function DELETE(
   
   const { id } = await params
   const supabase = await createAdminClient()
+
+  // 1. Ambil data pelanggan sebelum dipadam untuk tahu router_id dan username
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('username, router_id, service_type')
+    .eq('id', id)
+    .single()
+
+  // 2. Jika pelanggan ada di router, hantar perintah padam ke MikroTik
+  if (customer && customer.router_id) {
+    await supabase.from('mikrotik_command_queue').insert({
+      router_id: customer.router_id,
+      command: customer.service_type === 'PPPoE' ? 'remove_pppoe_secret' : 'remove_hotspot_user',
+      payload: { username: customer.username },
+      status: 'pending',
+    })
+  }
+
+  // 3. Padam rekod dari database
   const { error } = await supabase.from('customers').delete().eq('id', id)
   
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

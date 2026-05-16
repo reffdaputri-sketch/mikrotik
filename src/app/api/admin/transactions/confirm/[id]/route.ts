@@ -62,6 +62,26 @@ export async function POST(
       }
     }
 
+    // 4. JIKA INI TOP UP SALDO WALLET (Cek berdasarkan nama plan)
+    if (order.plan_name === 'Top Up Saldo Wallet') {
+      // Cari pelanggan berdasarkan customer_id yang tersimpan di order
+      const { data: customer } = await supabase.from('customers').select('*').eq('id', order.customer_id).single()
+      
+      if (customer) {
+        const newBalance = (Number(customer.balance) || 0) + Number(order.price)
+        await supabase.from('customers').update({ balance: newBalance }).eq('id', customer.id)
+        
+        // Catat di log saldo
+        await supabase.from('balance_logs').insert({
+          customer_id: customer.id,
+          amount: order.price,
+          type: 'topup',
+          description: `Top Up Manual (ACC Admin) - Order: ${order.order_id}`,
+          created_at: new Date().toISOString()
+        })
+      }
+    }
+
     return NextResponse.json({ success: true })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

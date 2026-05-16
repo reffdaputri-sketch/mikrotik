@@ -19,8 +19,8 @@ export async function GET(request: Request) {
     // 1. Cari pelanggan PPPoE yang Active, Auto-Cut nyala, dan Expired sudah lewat
     const { data: expiredCustomers, error } = await supabase
       .from('customers')
-      .select('*')
-      .eq('service_type', 'PPPoE')
+      .select('*, plans(*)')
+      .ilike('service_type', 'pppoe')
       .eq('auto_cut', true)
       .eq('status', 'Active')
       .lt('expired_at', now)
@@ -55,7 +55,29 @@ export async function GET(request: Request) {
         })
       }
 
-      results.push({ id: customer.id, username: customer.username, status: 'Cut-off Success' })
+      // c. Cetak Invois Tagihan otomatis jika belum ada yang PENDING
+      const { data: pending } = await supabase
+        .from('payment_orders')
+        .select('id')
+        .eq('customer_id', customer.id)
+        .eq('status', 'pending')
+
+      if (!pending || pending.length === 0) {
+        const orderId = `BILL-${Math.random().toString(36).slice(2, 9).toUpperCase()}`
+        await supabase.from('payment_orders').insert({
+          order_id: orderId,
+          customer_id: customer.id,
+          customer_name: customer.fullname,
+          plan_id: customer.plan_id,
+          plan_name: customer.plans?.name_plan || 'Pakej Internet',
+          price: customer.plans?.price || 0,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          description: `RENEWAL_PPPOE:${customer.id}`
+        })
+      }
+
+      results.push({ id: customer.id, username: customer.username, status: 'Cut-off & Invoice Generated' })
     }
 
     return NextResponse.json({ 

@@ -122,7 +122,7 @@ function PrintContent() {
                 paddingTop: '5px',
                 width: '100%'
               }}>
-                BY NUXBILL BILLING SYSTEM
+                BY PURNAMA WIFI
               </div>
             </div>
           ))}

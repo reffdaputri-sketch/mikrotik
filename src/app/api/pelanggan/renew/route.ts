@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       billDescription: `Pembaharuan internet untuk ${customer.username}`,
       billAmount: plan.price,
       billTo: customer.fullname,
-      billEmail: customer.email || 'customer@nuxbill.com',
+      billEmail: customer.email || 'customer@purnama.com',
       billPhone: customer.phonenumber,
       externalReferenceNo: order.order_id,
       returnUrl: `${appUrl}/pelanggan?status=pending`,

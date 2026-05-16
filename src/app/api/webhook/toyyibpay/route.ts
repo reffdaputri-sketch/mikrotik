@@ -46,6 +46,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ status: 'already_processed_or_not_found' })
     }
 
+    // --- LOGIKA TOP-UP WALLET ---
+    if (order.plan_name === 'Top Up Saldo Wallet' || order.order_id.startsWith('TOPUP-') || order.order_id.startsWith('TRF-')) {
+      // 1. Update order status
+      await supabase
+        .from('payment_orders')
+        .update({
+          status: 'paid',
+          paid_at: new Date().toISOString(),
+          payment_type: 'toyyibPay'
+        })
+        .eq('order_id', params.order_id)
+
+      // 2. Tambahkan saldo pelanggan
+      if (order.customer_id) {
+        const { data: customer } = await supabase.from('customers').select('balance').eq('id', order.customer_id).single()
+        const currentBalance = customer?.balance || 0
+        const topupAmount = order.price
+
+        await supabase.from('customers').update({
+          balance: currentBalance + topupAmount
+        }).eq('id', order.customer_id)
+
+        // 3. Catat di balance_logs
+        await supabase.from('balance_logs').insert({
+          customer_id: order.customer_id,
+          amount: topupAmount,
+          type: 'topup',
+          description: `Top-up via ToyyibPay (Order: ${order.order_id})`,
+        })
+      }
+
+      return new Response('OK', { status: 200 })
+    }
+    // ----------------------------
+
     const plan = order.plans
 
     // Ambil / generate voucher

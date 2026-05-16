@@ -125,7 +125,7 @@ export default function MapsPage() {
       <div className="page-header" style={{ marginBottom: '16px' }}>
         <div>
           <h1 className="page-title">Geo-Location Map</h1>
-          <p className="page-subtitle">Peta sebaran router dan pelanggan NuxBill</p>
+          <p className="page-subtitle">Peta sebaran router dan pelanggan Purnama WiFi</p>
         </div>
       </div>
 

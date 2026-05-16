@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Users, Search, Plus, Edit2, Trash2, RefreshCw, UserCheck, UserX, Mail, Phone, MapPin, Navigation, Map as MapIcon, X } from 'lucide-react'
+import { Users, Search, Plus, Edit2, Trash2, RefreshCw, UserCheck, UserX, Mail, Phone, MapPin, Navigation, Map as MapIcon, X, Wallet } from 'lucide-react'
 import { formatCurrency, timeAgo } from '@/lib/utils'
 
 interface Customer {
@@ -28,6 +28,10 @@ export default function CustomersPage() {
   const [saving, setSaving] = useState(false)
   const [plans, setPlans] = useState<any[]>([])
   const [routers, setRouters] = useState<any[]>([])
+  const [showTopupModal, setShowTopupModal] = useState(false)
+  const [selectedCustomerForTopup, setSelectedCustomerForTopup] = useState<Customer | null>(null)
+  const [topupAmount, setTopupAmount] = useState('')
+  const [topupLoading, setTopupLoading] = useState(false)
 
   const [form, setForm] = useState({
     username: '', password: '', fullname: '', email: '',
@@ -107,6 +111,29 @@ export default function CustomersPage() {
       alert('Gagal: ' + (data.error || 'Ralat sistem'))
     }
     setLoading(false)
+  }
+
+  async function handleCashTopup(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedCustomerForTopup || !topupAmount) return
+    
+    setTopupLoading(true)
+    const res = await fetch(`/api/admin/customers/${selectedCustomerForTopup.id}/topup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: parseFloat(topupAmount) })
+    })
+
+    if (res.ok) {
+      alert(`Berhasil menambah saldo RM ${topupAmount} untuk ${selectedCustomerForTopup.fullname}`)
+      setShowTopupModal(false)
+      setTopupAmount('')
+      fetchCustomers()
+    } else {
+      const data = await res.json()
+      alert('Gagal: ' + (data.error || 'Ralat sistem'))
+    }
+    setTopupLoading(false)
   }
 
   const filtered = customers.filter(c =>
@@ -201,6 +228,9 @@ export default function CustomersPage() {
                     <div style={{ display: 'flex', gap: '6px' }}>
                       <button onClick={() => handleRenew(c)} title="Lanjutkan 1 Bulan" className="btn btn-primary btn-sm" style={{ padding: '5px 8px', background: '#16a34a' }}>
                         <RefreshCw size={13} />
+                      </button>
+                       <button onClick={() => { setSelectedCustomerForTopup(c); setShowTopupModal(true); }} title="Isi Saldo Cash" className="btn btn-secondary btn-sm" style={{ padding: '5px 8px', background: '#fbbf24', borderColor: '#fbbf24' }}>
+                        <Wallet size={13} color="white" />
                       </button>
                       <button onClick={() => openEdit(c)} className="btn btn-secondary btn-sm" style={{ padding: '5px 8px' }}><Edit2 size={13} /></button>
                       <button className="btn btn-danger btn-sm" style={{ padding: '5px 8px' }}><Trash2 size={13} /></button>
@@ -330,6 +360,44 @@ export default function CustomersPage() {
           </div>
         </div>
       )}
+
+      {/* Cash Topup Modal */}
+      {showTopupModal && selectedCustomerForTopup && (
+        <div className="modal-overlay" onClick={() => setShowTopupModal(false)}>
+          <div className="modal-box" style={{ maxWidth: '400px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Top Up Saldo Cash</h3>
+              <button onClick={() => setShowTopupModal(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
+            </div>
+            <form onSubmit={handleCashTopup}>
+              <div className="modal-body">
+                <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.9rem', color: '#94a3b8' }}>Pelanggan:</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f1f5f9' }}>{selectedCustomerForTopup.fullname}</div>
+                </div>
+                <label className="form-label">Jumlah Top Up (RM)</label>
+                <input 
+                  type="number" 
+                  className="form-input" 
+                  style={{ height: '50px', fontSize: '20px', fontWeight: 800, textAlign: 'center' }}
+                  placeholder="0.00"
+                  value={topupAmount} 
+                  onChange={e => setTopupAmount(e.target.value)} 
+                  required 
+                  autoFocus
+                />
+              </div>
+              <div className="modal-footer">
+                <button type="button" onClick={() => setShowTopupModal(false)} className="btn btn-secondary">Batal</button>
+                <button type="submit" className="btn btn-primary" style={{ background: '#10b981', borderColor: '#10b981' }} disabled={topupLoading}>
+                  {topupLoading ? 'Memproses...' : 'ISI SALDO SEKARANG'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Map Picker Modal */}
       {showMapPicker && (
         <LocationPickerModal 

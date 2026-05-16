@@ -105,7 +105,7 @@ export async function POST(request: Request) {
           username: voucherUsername,
           password: voucherPassword,
           profile: plan.bandwidths?.name_bw || 'default',
-          comment: `NuxBill-${order_id}`,
+          comment: `Purnama-${order_id}`,
         },
         status: 'pending',
       })

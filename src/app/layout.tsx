@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'NuxBill — Sistem Billing MikroTik',
+  title: 'Purnama WiFi — Sistem Billing MikroTik',
   description: 'Platform billing hotspot dan PPPoE berbasis cloud dengan Supabase',
 }
 

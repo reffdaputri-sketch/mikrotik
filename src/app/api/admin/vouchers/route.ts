@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       plan_id: parseInt(plan_id),
       router_id: router_id ? parseInt(router_id) : null,
       username: code,
-      password: generateVoucherCode(6),
+      password: code,
       status: 'unused',
     })
   }

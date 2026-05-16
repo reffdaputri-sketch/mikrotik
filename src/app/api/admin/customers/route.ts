@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         username: body.username,
         password: body.password,
         profile: plan?.bandwidths?.name_bw || 'default',
-        comment: `NuxBill-${body.fullname}`,
+        comment: `Purnama-${body.fullname}`,
       },
       status: 'pending',
     })

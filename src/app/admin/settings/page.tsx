@@ -7,7 +7,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [config, setConfig] = useState<any>({
-    app_name: 'NuxBill',
+    app_name: 'Purnama WiFi',
     company_name: '',
     address: '',
     phone: '',
@@ -19,6 +19,8 @@ export default function SettingsPage() {
     duitku_api_key: '',
     duitku_is_production: 'false',
     local_agent_secret: '',
+    whatsapp_gateway_url: '',
+    whatsapp_api_key: '',
   })
 
   useEffect(() => {
@@ -130,6 +132,25 @@ export default function SettingsPage() {
                 <label className="form-label">Rahsia Ejen Tempatan (Secret)</label>
                 <input className="form-input" value={config.local_agent_secret} onChange={e => setConfig({...config, local_agent_secret: e.target.value})} />
                 <p style={{ fontSize: '0.65rem', color: '#475569', marginTop: '4px' }}>Kata laluan bersama antara Aplikasi Awan dan Ejen Tempatan di PC anda.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* WhatsApp Gateway */}
+          <div className="glass-card" style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
+              <Globe size={20} color="#22c55e" />
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>WhatsApp Gateway</h3>
+            </div>
+            <div style={{ display: 'grid', gap: '16px' }}>
+              <div>
+                <label className="form-label">URL Gateway</label>
+                <input className="form-input" placeholder="Contoh: https://api.fonnte.com/send" value={config.whatsapp_gateway_url} onChange={e => setConfig({...config, whatsapp_gateway_url: e.target.value})} />
+                <p style={{ fontSize: '0.65rem', color: '#475569', marginTop: '4px' }}>Biarkan kosong jika tidak menggunakannya.</p>
+              </div>
+              <div>
+                <label className="form-label">API Key (Token)</label>
+                <input type="password" className="form-input" value={config.whatsapp_api_key} onChange={e => setConfig({...config, whatsapp_api_key: e.target.value})} />
               </div>
             </div>
           </div>
