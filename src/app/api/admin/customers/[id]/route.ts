@@ -109,6 +109,10 @@ export async function DELETE(
     })
   }
 
+  // 2.5 Padam rekod rujukan bagi mengelakkan ralat kekunci asing (Foreign Key Constraint)
+  await supabase.from('payment_orders').delete().eq('customer_id', id)
+  await supabase.from('balance_logs').delete().eq('customer_id', id)
+
   // 3. Padam rekod dari database
   const { error } = await supabase.from('customers').delete().eq('id', id)
   

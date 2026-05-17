@@ -7,7 +7,6 @@ import { formatCurrency } from '@/lib/utils'
 export default function PelangganDashboard() {
   const [loading, setLoading] = useState(true)
   const [customer, setCustomer] = useState<any>(null)
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' })
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [topupTab, setTopupTab] = useState<'otomatis' | 'manual'>('otomatis')
   const [error, setError] = useState('')
@@ -19,11 +18,17 @@ export default function PelangganDashboard() {
   const [proofFile, setProofFile] = useState<File | null>(null)
   const [uploadingProof, setUploadingProof] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
-  const [isRegistering, setIsRegistering] = useState(false)
-  const [registerForm, setRegisterForm] = useState({ fullname: '', username: '', email: '', phonenumber: '', password: '' })
   const [activeTab, setActiveTab] = useState<'overview' | 'wallet' | 'history'>('overview')
   const [balanceLogs, setBalanceLogs] = useState<any[]>([])
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null)
+  // OTP Login states
+  const [loginUsername, setLoginUsername] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [loginOtp, setLoginOtp] = useState('')
+  const [loginShowPass, setLoginShowPass] = useState(false)
+  const [otpSent, setOtpSent] = useState(false)
+  const [loginInfo, setLoginInfo] = useState('')
+  const [maskedPhone, setMaskedPhone] = useState('')
 
   // Cek session dan fetch data terbaru
   useEffect(() => {
@@ -69,52 +74,52 @@ export default function PelangganDashboard() {
     }
   }
 
-  async function handleLogin(e: React.FormEvent) {
+  // ─── OTP Login Step 1: Verify username+password → Hantar OTP ────
+  async function handleSendLoginOtp(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
-    const res = await fetch('/api/pelanggan/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(loginForm)
-    })
+    setLoginInfo('')
+    try {
+      const res = await fetch('/api/pelanggan/login-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: loginUsername, password: loginPassword })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Gagal menghantar OTP')
+      setOtpSent(true)
+      setMaskedPhone(data.masked_phone || '')
+      setLoginInfo(data.message || 'Kod OTP telah dihantar ke WhatsApp anda')
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-    const data = await res.json()
-    if (res.ok) {
+  // ─── OTP Login Step 2: Verify OTP & Masuk ────────────────────────
+  async function handleVerifyLoginOtp(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/pelanggan/login-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: loginUsername, password: loginPassword, otp_code: loginOtp })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'OTP tidak sah')
+      if (!data.customer) throw new Error('Data akaun tidak dijumpai. Sila cuba lagi.')
       localStorage.setItem('nuxbill_customer', JSON.stringify(data.customer))
       setCustomer(data.customer)
       setIsLoggedIn(true)
-    } else {
-      setError(data.error || 'Login gagal. Sila semak semula username & kata laluan.')
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
-  }
-
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    
-    try {
-      const res = await fetch('/api/pelanggan/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(registerForm)
-      })
-
-      const data = await res.json()
-      if (res.ok) {
-        alert('Pendaftaran berjaya! Sila login menggunakan maklumat anda.')
-        setIsRegistering(false)
-        setLoginForm({ username: registerForm.username, password: registerForm.password })
-      } else {
-        setError(data.error || 'Pendaftaran gagal.')
-      }
-    } catch (err) {
-      setError('Ralat sistem berlaku saat pendaftaran.')
-    }
-    setLoading(false)
   }
 
   async function handlePay() {
@@ -239,77 +244,110 @@ export default function PelangganDashboard() {
               <Wifi color="white" size={36} />
             </div>
             <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#166534', letterSpacing: '-0.5px' }}>
-              {isRegistering ? 'Daftar Akun Baru' : 'Login Pelanggan'}
+              Login Pelanggan
             </h1>
             <p style={{ color: '#4b5563', fontSize: '15px', marginTop: '4px' }}>
-              {isRegistering ? 'Lengkapkan maklumat di bawah' : 'Pantau status & perbaharui internet anda'}
+              {otpSent ? 'Masukkan kod OTP dari WhatsApp anda' : 'Log masuk menggunakan nombor WhatsApp anda'}
             </p>
           </div>
 
-          {isRegistering ? (
-            <form onSubmit={handleRegister} style={{ display: 'grid', gap: '16px' }}>
-              {error && <div style={{ color: '#b91c1c', background: '#fef2f2', padding: '12px', borderRadius: '12px', fontSize: '14px', textAlign: 'center', border: '1px solid #fee2e2' }}>{error}</div>}
+          {/* INFO ALERT */}
+          {loginInfo && !error && (
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px', marginBottom: '16px', color: '#166534', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldCheck size={16} style={{ flexShrink: 0 }} /> {loginInfo}
+            </div>
+          )}
+          {error && (
+            <div style={{ color: '#b91c1c', background: '#fef2f2', padding: '12px', borderRadius: '12px', fontSize: '14px', textAlign: 'center', border: '1px solid #fee2e2', marginBottom: '16px' }}>{error}</div>
+          )}
+
+          {!otpSent ? (
+            // ── STEP 1: Username + Password ──
+            <form onSubmit={handleSendLoginOtp} style={{ display: 'grid', gap: '16px' }}>
               <div>
-                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '6px' }}>Nama Penuh</label>
-                <input className="form-input" placeholder="Contoh: Ahmad Ali" value={registerForm.fullname} onChange={e => setRegisterForm({...registerForm, fullname: e.target.value})} required />
-              </div>
-              <div>
-                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '6px' }}>Username (Untuk Login)</label>
-                <input className="form-input" placeholder="Contoh: alex88" value={registerForm.username} onChange={e => setRegisterForm({...registerForm, username: e.target.value})} required />
-              </div>
-              <div>
-                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '6px' }}>Nombor WhatsApp</label>
-                <input className="form-input" placeholder="Contoh: 0123456789" value={registerForm.phonenumber} onChange={e => setRegisterForm({...registerForm, phonenumber: e.target.value})} required />
-              </div>
-              <div>
-                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '6px' }}>E-mel (Pilihan)</label>
-                <input className="form-input" type="email" placeholder="email@contoh.com" value={registerForm.email} onChange={e => setRegisterForm({...registerForm, email: e.target.value})} />
-              </div>
-              <div>
-                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '6px' }}>Kata Laluan</label>
-                <input className="form-input" type="password" placeholder="Min 6 karakter" value={registerForm.password} onChange={e => setRegisterForm({...registerForm, password: e.target.value})} required />
-              </div>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '16px', fontWeight: 700, borderRadius: '14px', background: '#16a34a' }} disabled={loading}>
-                {loading ? 'Mendaftarkan...' : 'DAFTAR SEKARANG'}
-              </button>
-              <button type="button" onClick={() => setIsRegistering(false)} style={{ background: 'none', border: 'none', color: '#16a34a', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
-                Sudah ada akun? Login di sini
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleLogin} style={{ display: 'grid', gap: '20px' }}>
-              {error && <div style={{ color: '#b91c1c', background: '#fef2f2', padding: '12px', borderRadius: '12px', fontSize: '14px', textAlign: 'center', border: '1px solid #fee2e2' }}>{error}</div>}
-              <div>
-                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '8px' }}>Username / Kod Baucar</label>
-                <input 
-                  className="form-input" 
+                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '8px' }}>👤 Username</label>
+                <input
+                  id="login-username"
+                  className="form-input"
                   style={{ background: '#f9fafb', borderColor: '#e5e7eb', color: '#111827', height: '50px' }}
-                  placeholder="Masukkan username atau kod anda" value={loginForm.username} onChange={e => setLoginForm({...loginForm, username: e.target.value})} required 
+                  placeholder="Masukkan username anda"
+                  value={loginUsername}
+                  onChange={e => setLoginUsername(e.target.value)}
+                  required
                 />
               </div>
               <div>
-                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '8px' }}>Kata Laluan (Pilihan)</label>
-                <input 
-                  type="password" 
-                  className="form-input" 
-                  style={{ background: '#f9fafb', borderColor: '#e5e7eb', color: '#111827', height: '50px' }}
-                  placeholder="Biarkan kosong jika guna baucar" value={loginForm.password} onChange={e => setLoginForm({...loginForm, password: e.target.value})} 
-                />
+                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '8px' }}>🔒 Kata Laluan</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="login-password"
+                    className="form-input"
+                    style={{ background: '#f9fafb', borderColor: '#e5e7eb', color: '#111827', height: '50px', paddingRight: '44px' }}
+                    placeholder="Masukkan kata laluan"
+                    type={loginShowPass ? 'text' : 'password'}
+                    value={loginPassword}
+                    onChange={e => setLoginPassword(e.target.value)}
+                    required
+                  />
+                  <button type="button" onClick={() => setLoginShowPass(!loginShowPass)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: '18px' }}>
+                    {loginShowPass ? '🙈' : '👁️'}
+                  </button>
+                </div>
+                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '6px' }}>OTP akan dihantar ke WhatsApp yang berdaftar</p>
               </div>
-              <button 
-                type="submit" 
-                className="btn btn-primary" 
-                style={{ width: '100%', padding: '16px', fontSize: '16px', fontWeight: 700, borderRadius: '14px', background: '#16a34a', boxShadow: '0 4px 6px -1px rgba(22, 163, 74, 0.2)' }} 
+              <button
+                type="submit"
+                id="login-send-otp"
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '16px', fontSize: '16px', fontWeight: 700, borderRadius: '14px', background: '#16a34a' }}
                 disabled={loading}
               >
-                {loading ? 'Sila tunggu...' : 'MASUK KE DASHBOARD'}
+                {loading ? 'Menyemak...' : '📲 Hantar Kod OTP ke WhatsApp'}
               </button>
-              <button type="button" onClick={() => setIsRegistering(true)} style={{ background: 'none', border: 'none', color: '#16a34a', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
-                Belum ada akun? Daftar di sini
+              <a href="/daftar" style={{ textAlign: 'center', display: 'block', color: '#16a34a', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
+                Belum ada akaun? Daftar di sini →
+              </a>
+            </form>
+          ) : (
+            // ── STEP 2: Masukkan OTP ──
+            <form onSubmit={handleVerifyLoginOtp} style={{ display: 'grid', gap: '20px' }}>
+              <div>
+                <p style={{ fontSize: '14px', color: '#4b5563', textAlign: 'center', marginBottom: '8px' }}>
+                  OTP dihantar ke <strong style={{ color: '#166534' }}>{maskedPhone}</strong>
+                </p>
+                <label className="form-label" style={{ color: '#374151', fontWeight: 600, marginBottom: '8px' }}>🔑 Kod OTP (6 Digit)</label>
+                <input
+                  id="login-otp"
+                  className="form-input"
+                  style={{ background: '#f9fafb', borderColor: '#e5e7eb', color: '#111827', height: '50px', letterSpacing: '0.3em', textAlign: 'center', fontSize: '1.2rem' }}
+                  placeholder="123456"
+                  type="number"
+                  maxLength={6}
+                  value={loginOtp}
+                  onChange={e => setLoginOtp(e.target.value.slice(0, 6))}
+                  required
+                  autoFocus
+                />
+              </div>
+              <button
+                type="submit"
+                id="login-verify-otp"
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '16px', fontSize: '16px', fontWeight: 700, borderRadius: '14px', background: '#16a34a' }}
+                disabled={loading}
+              >
+                {loading ? 'Mengesahkan...' : '✅ Masuk ke Dashboard'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setOtpSent(false); setLoginOtp(''); setError(''); setLoginInfo(''); setMaskedPhone('') }}
+                style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '14px', cursor: 'pointer' }}
+              >
+                ← Kembali
               </button>
             </form>
           )}
-          
+
           <div style={{ textAlign: 'center', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #f3f4f6' }}>
             <a href="/beli" style={{ color: '#16a34a', fontSize: '14px', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
               Bukan pelanggan PPPoE? Beli Baucar <ChevronRight size={16} />
@@ -318,6 +356,12 @@ export default function PelangganDashboard() {
         </div>
       </div>
     )
+  }
+
+  // Safety guard: jika isLoggedIn tapi customer null, reset ke login
+  if (isLoggedIn && !customer) {
+    handleLogout()
+    return null
   }
 
   const isExpired = customer?.expired_at ? new Date(customer.expired_at) < new Date() : true

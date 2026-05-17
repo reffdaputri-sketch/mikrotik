@@ -5,8 +5,29 @@ import { getSession } from '@/lib/session'
 export async function GET() {
   if (!await getSession()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const supabase = await createAdminClient()
-  const { data: routers } = await supabase.from('routers').select('*').order('name')
-  return NextResponse.json({ routers: routers || [] })
+  const { data: rawRouters } = await supabase.from('routers').select('*').order('name')
+  
+  const routers = (rawRouters || []).map(r => {
+    let status = r.status || 'Offline'
+    
+    // Jika last_seen melebihi 15 detik yang lalu, anggap Offline (karena agent terputus/mati)
+    if (r.last_seen) {
+      const lastSeenTime = new Date(r.last_seen).getTime()
+      const nowTime = new Date().getTime()
+      if (nowTime - lastSeenTime > 15000) {
+        status = 'Offline'
+      }
+    } else {
+      status = 'Offline'
+    }
+    
+    return {
+      ...r,
+      status
+    }
+  })
+  
+  return NextResponse.json({ routers })
 }
 
 export async function POST(request: Request) {

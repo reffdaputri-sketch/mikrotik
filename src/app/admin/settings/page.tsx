@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Save, Shield, Globe, CreditCard, Bell, RefreshCw } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Save, Shield, Globe, CreditCard, RefreshCw, Wifi, WifiOff, QrCode, Unlink } from 'lucide-react'
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  // WA Agent states
+  const [waStatus, setWaStatus] = useState<any>(null)
+  const [waQR, setWaQR] = useState<string | null>(null)
+  const [waLoading, setWaLoading] = useState(false)
+  const pollRef = useRef<NodeJS.Timeout | null>(null)
   const [config, setConfig] = useState<any>({
     app_name: 'Purnama WiFi',
     company_name: '',
@@ -32,7 +37,65 @@ export default function SettingsPage() {
         }
         setLoading(false)
       })
+
+    // Fetch WA status pertama kali
+    fetchWaStatus()
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current)
+    }
   }, [])
+
+  async function fetchWaStatus() {
+    try {
+      const res = await fetch('/api/admin/whatsapp')
+      if (!res.ok) throw new Error('Agent tidak berjalan')
+      const data = await res.json()
+      setWaStatus(data)
+
+      if (!data.connected && data.hasQR) {
+        // Ambil QR code melalui proxy
+        const qrRes = await fetch('/api/admin/whatsapp?action=qr')
+        if (qrRes.ok) {
+          const qrData = await qrRes.json()
+          if (qrData.qr) setWaQR(qrData.qr)
+        }
+        // Mula polling setiap 3 saat
+        startPolling()
+      } else if (data.connected) {
+        setWaQR(null)
+        stopPolling()
+      }
+    } catch (err) {
+      setWaStatus({ connected: false, error: 'Gagal menghubungi WhatsApp Agent' })
+    }
+  }
+
+  function startPolling() {
+    if (pollRef.current) return // Elak double polling
+    pollRef.current = setInterval(fetchWaStatus, 3000)
+  }
+
+  function stopPolling() {
+    if (pollRef.current) {
+      clearInterval(pollRef.current)
+      pollRef.current = null
+    }
+  }
+
+  async function handleWaDisconnect() {
+    if (!confirm('Adakah anda pasti ingin putuskan sambungan WhatsApp? QR baru akan dijana.')) return
+    setWaLoading(true)
+    setWaQR(null)
+    try {
+      await fetch('/api/admin/whatsapp', { method: 'POST' })
+      setWaStatus({ connected: false, hasQR: false, message: 'Memutuskan... QR baru akan muncul dalam beberapa saat.' })
+      setTimeout(() => { fetchWaStatus(); startPolling() }, 3000)
+    } catch (err) {
+      alert('Gagal putuskan sambungan. Pastikan WA Agent berjalan.')
+    }
+    setWaLoading(false)
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -60,6 +123,99 @@ export default function SettingsPage() {
       <form onSubmit={handleSave}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
           
+          {/* WhatsApp Gateway Manager (Sambungan WhatsApp Agent) */}
+          <div className="glass-card" style={{ padding: '24px', gridColumn: '1 / -1' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
+              <QrCode size={20} color="#22c55e" />
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Sambungan WhatsApp Agent</h3>
+              <button
+                type="button"
+                onClick={fetchWaStatus}
+                style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.05)', border: '1px solid #1e293b', borderRadius: '8px', padding: '6px 12px', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem' }}
+              >
+                <RefreshCw size={13} /> Refresh Status
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
+              {/* Status Panel */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', borderRadius: '12px', background: waStatus?.connected ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${waStatus?.connected ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, marginBottom: '16px' }}>
+                  {waStatus?.connected
+                    ? <Wifi size={24} color="#22c55e" />
+                    : <WifiOff size={24} color="#ef4444" />
+                  }
+                  <div>
+                    <div style={{ fontWeight: 700, color: waStatus?.connected ? '#22c55e' : '#ef4444', fontSize: '0.95rem' }}>
+                      {waStatus?.connected ? '✅ Tersambung' : '❌ Tidak Tersambung'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>
+                      {waStatus?.message || waStatus?.error || 'Semak status...'}
+                    </div>
+                    {waStatus?.phone && (
+                      <div style={{ fontSize: '0.75rem', color: '#22c55e', marginTop: '2px' }}>📱 {waStatus.phone}</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Info panduan */}
+                <div style={{ background: 'rgba(59,130,246,0.05)', border: '1px solid rgba(59,130,246,0.15)', borderRadius: '10px', padding: '14px', fontSize: '0.78rem', color: '#64748b', lineHeight: 1.7 }}>
+                  <strong style={{ color: '#93c5fd' }}>📋 Cara Sambung:</strong><br/>
+                  1. Pastikan wa-agent berjalan di <code style={{ color: '#f1f5f9', background: 'rgba(255,255,255,0.05)', padding: '1px 4px', borderRadius: '3px' }}>https://wa.baharimedika.com</code><br/>
+                  2. Klik <strong style={{ color: '#f1f5f9' }}>Refresh Status</strong> hingga QR muncul<br/>
+                  3. Imbas QR dengan WhatsApp anda<br/>
+                  4. Status akan bertukar menjadi <span style={{ color: '#22c55e' }}>Tersambung</span>
+                </div>
+
+                {waStatus?.connected && (
+                  <button
+                    type="button"
+                    onClick={handleWaDisconnect}
+                    disabled={waLoading}
+                    style={{ marginTop: '16px', width: '100%', padding: '10px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', color: '#f87171', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 600 }}
+                  >
+                    <Unlink size={15} /> {waLoading ? 'Memutuskan...' : 'Putus & Jana QR Baru'}
+                  </button>
+                )}
+              </div>
+
+              {/* QR Code Panel */}
+              <div style={{ textAlign: 'center' }}>
+                {waStatus?.connected ? (
+                  <div style={{ padding: '40px', background: 'rgba(34,197,94,0.05)', borderRadius: '16px', border: '1px solid rgba(34,197,94,0.2)' }}>
+                    <Wifi size={48} color="#22c55e" style={{ margin: '0 auto 12px' }} />
+                    <p style={{ color: '#4ade80', fontWeight: 700 }}>WhatsApp Aktif</p>
+                    <p style={{ color: '#64748b', fontSize: '0.8rem' }}>OTP boleh dihantar</p>
+                  </div>
+                ) : waQR ? (
+                  <div>
+                    <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginBottom: '12px' }}>Imbas dengan WhatsApp → Peranti Tertaut → Tambah Peranti</p>
+                    <img
+                      src={waQR}
+                      alt="WhatsApp QR Code"
+                      style={{ width: '220px', height: '220px', borderRadius: '12px', border: '4px solid #22c55e', display: 'block', margin: '0 auto' }}
+                    />
+                    <p style={{ color: '#64748b', fontSize: '0.72rem', marginTop: '10px' }}>QR tamat dalam ~60 saat. Klik Refresh jika tamat.</p>
+                  </div>
+                ) : (
+                  <div style={{ padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px dashed #1e293b' }}>
+                    <QrCode size={48} color="#334155" style={{ margin: '0 auto 12px' }} />
+                    <p style={{ color: '#475569', fontSize: '0.85rem' }}>
+                      {waStatus?.error ? 'WA Agent tidak berjalan' : 'Klik Refresh Status untuk muat QR'}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={fetchWaStatus}
+                      style={{ marginTop: '12px', padding: '8px 20px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '8px', color: '#4ade80', cursor: 'pointer', fontSize: '0.85rem' }}
+                    >
+                      Muat QR Code
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* General Tetapan */}
           <div className="glass-card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
@@ -92,35 +248,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Duitku Tetapan */}
-          <div className="glass-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
-              <CreditCard size={20} color="#4ade80" />
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Gerbang Pembayaran (Duitku)</h3>
-            </div>
-            <div style={{ display: 'grid', gap: '16px' }}>
-              <div>
-                <label className="form-label">Kod Pedagang Duitku</label>
-                <input className="form-input" value={config.duitku_merchant_code} onChange={e => setConfig({...config, duitku_merchant_code: e.target.value})} />
-              </div>
-              <div>
-                <label className="form-label">Duitku API Key</label>
-                <input type="password" className="form-input" value={config.duitku_api_key} onChange={e => setConfig({...config, duitku_api_key: e.target.value})} />
-              </div>
-              <div>
-                <label className="form-label">Mod Produksi</label>
-                <select className="form-input" value={config.duitku_is_production} onChange={e => setConfig({...config, duitku_is_production: e.target.value})}>
-                  <option value="false">Sandbox (Percubaan)</option>
-                  <option value="true">Produksi (Live)</option>
-                </select>
-              </div>
-              <div style={{ background: 'rgba(74,222,128,0.05)', padding: '12px', borderRadius: '8px', fontSize: '0.75rem', color: '#64748b' }}>
-                Gunakan URL callback berikut di papan pemuka Duitku:<br/>
-                <code>{process.env.NEXT_PUBLIC_APP_URL}/api/webhook/duitku</code>
-              </div>
-            </div>
-          </div>
-
           {/* Security & Agent */}
           <div className="glass-card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
@@ -132,25 +259,6 @@ export default function SettingsPage() {
                 <label className="form-label">Rahsia Ejen Tempatan (Secret)</label>
                 <input className="form-input" value={config.local_agent_secret} onChange={e => setConfig({...config, local_agent_secret: e.target.value})} />
                 <p style={{ fontSize: '0.65rem', color: '#475569', marginTop: '4px' }}>Kata laluan bersama antara Aplikasi Awan dan Ejen Tempatan di PC anda.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* WhatsApp Gateway */}
-          <div className="glass-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
-              <Globe size={20} color="#22c55e" />
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>WhatsApp Gateway</h3>
-            </div>
-            <div style={{ display: 'grid', gap: '16px' }}>
-              <div>
-                <label className="form-label">URL Gateway</label>
-                <input className="form-input" placeholder="Contoh: https://api.fonnte.com/send" value={config.whatsapp_gateway_url} onChange={e => setConfig({...config, whatsapp_gateway_url: e.target.value})} />
-                <p style={{ fontSize: '0.65rem', color: '#475569', marginTop: '4px' }}>Biarkan kosong jika tidak menggunakannya.</p>
-              </div>
-              <div>
-                <label className="form-label">API Key (Token)</label>
-                <input type="password" className="form-input" value={config.whatsapp_api_key} onChange={e => setConfig({...config, whatsapp_api_key: e.target.value})} />
               </div>
             </div>
           </div>

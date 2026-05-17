@@ -14,6 +14,7 @@ export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [hasMounted, setHasMounted] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const [selectedNews, setSelectedNews] = useState<any | null>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -454,7 +455,12 @@ export default function LandingPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '28px' }}>
             {news.map(n => (
-              <div key={n.id} className="news-card" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div
+                key={n.id}
+                className="news-card bubbly-button"
+                style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
+                onClick={() => setSelectedNews(n)}
+              >
                 {n.image_url && <div style={{ height: '190px', background: `url(${n.image_url}) center/cover`, borderBottom: '3px solid #bbf7d0' }} />}
                 <div style={{ padding: '28px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '7px', color: '#16a34a', fontSize: '13px', fontWeight: 800, background: '#f0fdf4', padding: '5px 12px', borderRadius: '50px', width: 'fit-content', marginBottom: '14px', border: '2px solid #bbf7d0' }}>
@@ -462,7 +468,12 @@ export default function LandingPage() {
                     {new Date(n.created_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </div>
                   <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#14532d', marginBottom: '12px' }}>{n.title}</h3>
-                  <p style={{ color: '#166534', fontSize: '15px', lineHeight: 1.65, fontWeight: 600, flex: 1 }}>{n.content}</p>
+                  <p style={{ color: '#166534', fontSize: '15px', lineHeight: 1.65, fontWeight: 600, flex: 1 }}>
+                    {n.content.length > 100 ? n.content.substring(0, 100) + '...' : n.content}
+                  </p>
+                  <div style={{ marginTop: '16px', color: '#ea580c', fontWeight: 900, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    Baca Selengkapnya <span style={{ transition: 'transform 0.2s' }}>➔</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -486,6 +497,81 @@ export default function LandingPage() {
           &copy; 2026 Purnama WiFi Malaysia. Jadikan Internet Lebih Menyeronokkan!
         </p>
       </footer>
+
+      {/* ── NEWS DETAIL MODAL ── */}
+      {selectedNews && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 99999,
+          background: 'rgba(20,83,45,0.4)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+        }} onClick={() => setSelectedNews(null)}>
+          <div style={{
+            background: 'white', borderRadius: '32px', border: '4px solid #bbf7d0',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)', width: '100%', maxWidth: '640px',
+            maxHeight: '85vh', overflowY: 'auto', display: 'flex', flexDirection: 'column',
+            animation: 'scale-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            boxSizing: 'border-box'
+          }} onClick={e => e.stopPropagation()}>
+            <style>{`
+              @keyframes scale-up {
+                from { transform: scale(0.9); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+              }
+            `}</style>
+
+            {/* Modal Header/Image */}
+            {selectedNews.image_url && (
+              <div style={{ height: '260px', background: `url(${selectedNews.image_url}) center/cover`, borderBottom: '4px solid #bbf7d0', position: 'relative' }}>
+                <button onClick={() => setSelectedNews(null)} style={{
+                  position: 'absolute', top: '16px', right: '16px',
+                  width: '36px', height: '36px', borderRadius: '50%',
+                  background: 'white', border: '3px solid #bbf7d0', color: '#16a34a',
+                  fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 3px 0 #bbf7d0'
+                }}>×</button>
+              </div>
+            )}
+
+            {/* Modal Body */}
+            <div style={{ padding: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '7px', color: '#16a34a', fontSize: '13px', fontWeight: 800, background: '#f0fdf4', padding: '5px 12px', borderRadius: '50px', border: '2px solid #bbf7d0' }}>
+                  <Calendar size={14} strokeWidth={3} />
+                  {new Date(selectedNews.created_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </div>
+                {!selectedNews.image_url && (
+                  <button onClick={() => setSelectedNews(null)} style={{
+                    marginLeft: 'auto', width: '32px', height: '32px', borderRadius: '50%',
+                    background: '#f0fdf4', border: '2px solid #bbf7d0', color: '#16a34a',
+                    fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  }}>×</button>
+                )}
+              </div>
+
+              <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#14532d', marginBottom: '16px', lineHeight: 1.2 }}>{selectedNews.title}</h2>
+              
+              <div style={{ 
+                color: '#166534', fontSize: '16px', lineHeight: 1.8, fontWeight: 600, 
+                whiteSpace: 'pre-line', maxHeight: '30vh', overflowY: 'auto', paddingRight: '8px'
+              }}>
+                {selectedNews.content}
+              </div>
+
+              <button
+                onClick={() => setSelectedNews(null)}
+                className="bubbly-button"
+                style={{
+                  marginTop: '28px', width: '100%', padding: '14px', borderRadius: '50px',
+                  background: '#16a34a', color: 'white', fontSize: '16px', fontWeight: 900,
+                  border: 'none', boxShadow: '0 4px 0 #15803d'
+                }}
+              >
+                Tutup Mesej
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

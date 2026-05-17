@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { sendWhatsApp } from '@/lib/whatsapp'
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
       .from('customers')
       .select('id')
       .or(`username.eq.${username},phonenumber.eq.${phonenumber}`)
-      .single()
+      .maybeSingle()
 
     if (existing) {
       return NextResponse.json({ error: 'Username atau Nombor telefon ini sudah pun berdaftar' }, { status: 400 })
@@ -62,9 +63,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Gagal mendaftar. Sila cuba lagi.' }, { status: 500 })
     }
 
+    // 4. Hantar Butiran Log Masuk via WhatsApp secara automatik
+    const welcomeMessage = 
+      `🎉 *PENDAFTARAN BERJAYA (PURNAMA WIFI)* 🎉\n\n` +
+      `Hai *${fullname}*,\n` +
+      `Tahniah! Akaun pelanggan Purnama WiFi anda telah berjaya didaftarkan. 🎉\n\n` +
+      `Berikut adalah butiran akaun anda untuk simpanan/rujukan:\n` +
+      `👤 *Nama Penuh:* ${fullname}\n` +
+      `📱 *No. WhatsApp:* ${phonenumber}\n` +
+      `🔗 *Username:* ${username}\n` +
+      `🔑 *Kata Laluan:* ${password}\n\n` +
+      `Sila simpan butiran ini dengan selamat agar anda tidak lupa sekiranya akaun anda terkeluar (logout).\n\n` +
+      `Portal Pelanggan:\n` +
+      `🔗 https://purnamawifi.net/pelanggan\n\n` +
+      `Terima kasih kerana menyertai kami! 🙏`
+
+    const sent = await sendWhatsApp(phonenumber, welcomeMessage)
+    if (!sent) {
+      console.warn(`[REGISTER-WELCOME] Gagal hantar mesej selamat datang ke ${phonenumber}`)
+    }
+
     return NextResponse.json({ 
       success: true, 
-      message: 'Pendaftaran berjaya! Sila login menggunakan nombor telefon anda.',
+      message: 'Pendaftaran berjaya! Butiran akaun telah dihantar ke WhatsApp anda.',
       customer 
     })
 

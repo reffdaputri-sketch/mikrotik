@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# WhatsApp Agent sessions and dependencies
+wa-agent/auth_info_baileys/
+wa-agent/node_modules/
+
+# Local transaction proofs uploads
+/public/uploads/

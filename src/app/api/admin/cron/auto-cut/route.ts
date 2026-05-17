@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { sendWhatsApp } from '@/lib/whatsapp'
 
 // API ini bisa dipanggil pakai Cron Job (misal tiap jam atau tiap hari jam 00:01)
 export async function GET(request: Request) {
@@ -77,7 +78,29 @@ export async function GET(request: Request) {
         })
       }
 
-      results.push({ id: customer.id, username: customer.username, status: 'Cut-off & Invoice Generated' })
+      // d. Hantar Notifikasi WhatsApp automatik jika nombor WA wujud
+      let waStatus = 'No Phone'
+      if (customer.phonenumber) {
+        const expiryDate = customer.expired_at 
+          ? new Date(customer.expired_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) 
+          : 'Tarikh Luput'
+        const planName = customer.plans?.name_plan || 'Pakej Internet'
+        const price = customer.plans?.price || 0
+        const message = `⚠️ *NOTIFIKASI TAMAT TEMPOH (PURNAMA WIFI)* ⚠️\n\n` +
+          `Salam sejahtera *${customer.fullname}*,\n\n` +
+          `Makluman: Akaun internet PPPoE anda (*${customer.username}*) telah *TAMAT TEMPOH* pada *${expiryDate}*.\n\n` +
+          `Pakej: *${planName}*\n` +
+          `Jumlah Bayaran: *RM ${price}*\n\n` +
+          `Sila buat pembayaran segera bagi memastikan sambungan internet anda kekal aktif tanpa gangguan.\n\n` +
+          `Anda boleh membuat pembayaran secara atas talian di Portal Pelanggan kami:\n` +
+          `🔗 https://purnamawifi.net/pelanggan\n\n` +
+          `Terima kasih kerana memilih Purnama WiFi! 🙏`
+
+        const sent = await sendWhatsApp(customer.phonenumber, message)
+        waStatus = sent ? 'WA Notified' : 'WA Failed'
+      }
+
+      results.push({ id: customer.id, username: customer.username, status: 'Cut-off & Invoice Generated', wa: waStatus })
     }
 
     return NextResponse.json({ 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Ticket, Search, Plus, Trash2, Printer, RefreshCw, Filter, CheckCircle, Clock, XCircle, MoreVertical } from 'lucide-react'
+import { Ticket, Search, Plus, Trash2, Printer, RefreshCw, Filter, CheckCircle, Clock, XCircle, MoreVertical, Play } from 'lucide-react'
 import { formatCurrency, timeAgo } from '@/lib/utils'
 
 interface Voucher {
@@ -74,6 +74,24 @@ export default function VouchersPage() {
     if (!confirm('Padam baucar ini?')) return
     await fetch(`/api/admin/vouchers?id=${id}`, { method: 'DELETE' })
     fetchVouchers()
+  }
+
+  async function handleUseVoucher(id: number, code: string) {
+    if (!confirm(`Gunakan baucar ${code} secara TUNAI?\nTindakan ini akan mengaktifkan baucar dan memuatkannya ke dalam MikroTik.`)) return
+    
+    setLoading(true)
+    const res = await fetch(`/api/admin/vouchers?id=${id}`, {
+      method: 'PUT',
+    })
+    
+    if (res.ok) {
+      alert('Baucar berjaya digunakan dan dihantar ke MikroTik!')
+      fetchVouchers()
+    } else {
+      const data = await res.json()
+      alert('Gagal: ' + (data.error || 'Ralat sistem'))
+      setLoading(false)
+    }
   }
 
   const toggleSelect = (id: number) => {
@@ -174,6 +192,9 @@ export default function VouchersPage() {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '6px' }}>
+                      {v.status === 'unused' && (
+                        <button onClick={() => handleUseVoucher(v.id, v.code)} className="btn btn-primary btn-sm" style={{ padding: '5px 8px', background: '#10b981', borderColor: '#10b981' }} title="Gunakan (Cash)"><Play size={13} /></button>
+                      )}
                       <button onClick={() => window.open(`/admin/vouchers/print?ids=${v.id}`, '_blank')} className="btn btn-secondary btn-sm" style={{ padding: '5px 8px' }} title="Cetak"><Printer size={13} /></button>
                       <button onClick={() => handleDelete(v.id)} className="btn btn-danger btn-sm" style={{ padding: '5px 8px' }} title="Padam"><Trash2 size={13} /></button>
                     </div>

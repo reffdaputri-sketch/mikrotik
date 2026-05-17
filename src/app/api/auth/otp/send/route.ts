@@ -12,12 +12,13 @@ export async function POST(request: Request) {
 
     const supabase = await createAdminClient()
 
-    // Semak sama ada nombor dah daftar (optional)
+    // Semak sama ada nombor dah daftar
+    // PENTING: guna maybeSingle() bukan single() — single() akan throw error jika 0 rows
     const { data: existing } = await supabase
       .from('customers')
       .select('id')
       .eq('phonenumber', phone)
-      .single()
+      .maybeSingle()
 
     if (existing) {
       return NextResponse.json({ error: 'Nombor telefon ini sudah berdaftar' }, { status: 400 })
@@ -50,11 +51,11 @@ export async function POST(request: Request) {
     const sent = await sendWhatsApp(phone, message)
 
     if (!sent) {
-      // Walaupun gagal hantar WA, kita tak block flow (mungkin local dev), 
-      // tapi dalam production kita sepatutnya return error
-      console.warn('Gagal hantar WA, tapi OTP disimpan')
+      console.warn('[OTP] Gagal hantar WA, tapi OTP disimpan. Semak wa-agent berjalan di port 3001.')
+      // Tetap return success supaya user boleh cuba masukkan OTP secara manual
     }
 
+    console.log(`[OTP] OTP ${otpCode} dihantar ke ${phone}`)
     return NextResponse.json({ success: true, message: 'OTP telah dihantar ke WhatsApp anda' })
 
   } catch (err: any) {

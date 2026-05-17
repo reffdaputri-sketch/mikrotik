@@ -136,6 +136,24 @@ export default function CustomersPage() {
     setTopupLoading(false)
   }
 
+  async function handleDelete(c: Customer) {
+    if (!confirm(`Padam pelanggan ${c.fullname} (@${c.username})? Tindakan ini juga akan memadamkan akaun beliau dari MikroTik.`)) return
+    
+    setLoading(true)
+    const res = await fetch(`/api/admin/customers/${c.id}`, {
+      method: 'DELETE',
+    })
+    
+    if (res.ok) {
+      alert('Pelanggan berjaya dipadam!')
+      fetchCustomers()
+    } else {
+      const data = await res.json()
+      alert('Gagal: ' + (data.error || 'Ralat sistem'))
+      setLoading(false)
+    }
+  }
+
   const filtered = customers.filter(c =>
     c.fullname.toLowerCase().includes(search.toLowerCase()) ||
     c.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -233,7 +251,7 @@ export default function CustomersPage() {
                         <Wallet size={13} color="white" />
                       </button>
                       <button onClick={() => openEdit(c)} className="btn btn-secondary btn-sm" style={{ padding: '5px 8px' }}><Edit2 size={13} /></button>
-                      <button className="btn btn-danger btn-sm" style={{ padding: '5px 8px' }}><Trash2 size={13} /></button>
+                      <button onClick={() => handleDelete(c)} className="btn btn-danger btn-sm" style={{ padding: '5px 8px' }} title="Padam Pelanggan"><Trash2 size={13} /></button>
                     </div>
                   </td>
                 </tr>
