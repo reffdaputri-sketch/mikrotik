@@ -551,6 +551,15 @@
           <span class="stat-label">Poll Interval</span>
         </div>
       </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color: #a78bfa; background: rgba(167, 139, 250, 0.08);">
+          <i data-lucide="ticket" style="width: 22px; height: 22px; color: #a78bfa;"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="today-vouchers-val">0</span>
+          <span class="stat-label">Voucher Hari Ini</span>
+        </div>
+      </div>
     </div>
 
     <!-- Left Column: Connected Routers -->
@@ -609,6 +618,7 @@
     const memoryVal = document.getElementById('memory-val');
     const cmdCountVal = document.getElementById('cmd-count-val');
     const pollIntervalVal = document.getElementById('poll-interval-val');
+    const todayVouchersVal = document.getElementById('today-vouchers-val');
     const routersList = document.getElementById('routers-list');
     const routerCountBadge = document.getElementById('router-count');
     const logsContainer = document.getElementById('logs-container');
@@ -639,6 +649,7 @@
         pollIntervalVal.textContent = (data.stats.pollInterval / 1000) + 's';
         cmdCountVal.textContent = data.stats.totalCommands;
         commandRunCount = data.stats.totalCommands;
+        todayVouchersVal.textContent = data.stats.todayVouchers || 0;
 
         // Render Routers
         routersList.innerHTML = '';

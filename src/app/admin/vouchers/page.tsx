@@ -19,11 +19,25 @@ interface Voucher {
 
 export default function VouchersPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([])
+  const [todayCount, setTodayCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('unused')
   const [showGenModal, setShowGenModal] = useState(false)
   const [generating, setGenerating] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/admin/vouchers')
+      .then(r => r.json())
+      .then(d => {
+        const list = d.vouchers || []
+        const startOfToday = new Date()
+        startOfToday.setHours(0, 0, 0, 0)
+        const count = list.filter((v: any) => new Date(v.created_at) >= startOfToday).length
+        setTodayCount(count)
+      })
+      .catch(console.error)
+  }, [vouchers])
   
   const [plans, setPlans] = useState<{id: number, name_plan: string}[]>([])
   const [routers, setRouters] = useState<{id: number, name: string}[]>([])
@@ -130,6 +144,29 @@ export default function VouchersPage() {
           <Link href="/admin/vouchers/generate" className="btn btn-primary btn-sm">
             <Plus size={14} /> Jana Baucar
           </Link>
+        </div>
+      </div>
+
+      {/* Stats Cards Row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <div className="glass-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '12px' }}>
+          <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(96, 165, 250, 0.1)', color: '#60a5fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Ticket size={20} />
+          </div>
+          <div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9' }}>{vouchers.length}</div>
+            <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Jumlah Baucar</div>
+          </div>
+        </div>
+        
+        <div className="glass-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid rgba(16, 185, 129, 0.08)', borderRadius: '12px' }}>
+          <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <CheckCircle size={20} />
+          </div>
+          <div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#10b981' }}>{todayCount}</div>
+            <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Diinput Hari Ini</div>
+          </div>
         </div>
       </div>
 

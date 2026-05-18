@@ -375,11 +375,20 @@ app.get('/api/status', async (req, res) => {
     const { data: routers } = await supabase.from('routers').select('*')
     const activeKeys = Object.keys(routerConnections)
     
+    // Count vouchers created today since midnight
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    const { count: todayVouchersCount } = await supabase
+      .from('vouchers')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', startOfToday.toISOString())
+    
     const stats = {
       uptime: Math.floor(process.uptime()),
       memory: (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + ' MB',
       totalCommands: totalCommandsCount,
-      pollInterval: POLL_INTERVAL
+      pollInterval: POLL_INTERVAL,
+      todayVouchers: todayVouchersCount || 0
     }
     
     res.json({
