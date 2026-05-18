@@ -10,6 +10,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
     "dotenv": "^16.4.5",
+    "express": "^5.2.1",
     "node-routeros": "^1.5.11",
     "ws": "^8.20.1"
   }

@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NuxBill MikroTik Agent - Dashboard</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+      --panel-bg: rgba(30, 41, 59, 0.45);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #10b981;
+      --primary-glow: rgba(16, 185, 129, 0.2);
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding: 24px;
+    }
+
+    /* Grid background mesh overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: radial-gradient(rgba(16, 185, 129, 0.05) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    header {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title span {
+      background: linear-gradient(90deg, #10b981, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #34d399;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+    }
+
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
+    main {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+      flex: 1;
+    }
+
+    /* Stats Grid Row */
+    .stats-container {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(16, 185, 129, 0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    /* Left Side: Router list */
+    .left-column {
+      grid-column: span 5;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .left-column {
+        grid-column: span 12;
+      }
+    }
+
+    /* Right Side: Log terminal */
+    .right-column {
+      grid-column: span 7;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .right-column {
+        grid-column: span 12;
+      }
+    }
+
+    .panel-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      min-height: 380px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Router list styling */
+    .router-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      max-height: 520px;
+      padding-right: 4px;
+    }
+
+    .router-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s;
+    }
+
+    .router-card:hover {
+      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .router-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+    }
+
+    .router-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-main);
+    }
+
+    .router-ip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .router-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 50px;
+      text-transform: uppercase;
+    }
+
+    .badge-connected {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .badge-disconnected {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-muted);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .test-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      background: rgba(16, 185, 129, 0.08);
+      color: #34d399;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .test-btn:hover {
+      background: rgba(16, 185, 129, 0.18);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+    }
+
+    .test-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .test-result-bar {
+      font-size: 0.76rem;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .res-success {
+      display: flex;
+      background: rgba(16, 185, 129, 0.1);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .res-error {
+      display: flex;
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+
+    /* Terminal console styling */
+    .terminal-box {
+      flex: 1;
+      background: #070b13;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 480px;
+    }
+
+    .terminal-controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .terminal-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .terminal-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+
+    .terminal-content {
+      flex: 1;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .log-line {
+      display: flex;
+      align-items: start;
+      gap: 10px;
+      animation: fadeIn 0.2s ease-out;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.02);
+      padding-bottom: 6px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .log-time {
+      color: #475569;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .log-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .log-badge-system { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+    .log-badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .log-badge-command { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .log-badge-error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .log-badge-info { background: rgba(255, 255, 255, 0.05); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.1); }
+
+    .log-text {
+      color: #e2e8f0;
+      word-break: break-all;
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-section">
+      <div class="brand-icon">
+        <i data-lucide="cpu" style="width: 28px; height: 28px; color: white;"></i>
+      </div>
+      <div>
+        <h1 class="brand-title">NuxBill <span>MikroTik Agent</span></h1>
+        <p style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500; margin-top: 2px;">Local API Bridge & Command Listener</p>
+      </div>
+    </div>
+    <div class="status-badge">
+      <div class="pulse-dot"></div>
+      ACTIVE & ONLINE
+    </div>
+  </header>
+
+  <main>
+    <!-- Stats Row -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i data-lucide="clock" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="uptime-val">00:00:00</span>
+          <span class="stat-label">Agent Uptime</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i data-lucide="database" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="memory-val">-- MB</span>
+          <span class="stat-label">Memory Usage</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i data-lucide="terminal" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="cmd-count-val">0</span>
+          <span class="stat-label">Commands Run</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i data-lucide="radio" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value" id="poll-interval-val">--s</span>
+          <span class="stat-label">Poll Interval</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Left Column: Connected Routers -->
+    <section class="left-column">
+      <div class="panel-card">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <i data-lucide="server" style="width: 20px; height: 20px; color: var(--primary);"></i>
+            Penyambung Router
+          </h2>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);" id="router-count">0 Router</span>
+        </div>
+        <div class="router-list" id="routers-list">
+          <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+            <i data-lucide="loader" class="animate-spin" style="margin: 0 auto 12px; width: 32px; height: 32px;"></i>
+            Memuat senarai router...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Live Terminal logs -->
+    <section class="right-column">
+      <div class="panel-card">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <i data-lucide="activity" style="width: 20px; height: 20px; color: var(--accent);"></i>
+            Aktiviti Konsol Robot
+          </h2>
+          <span style="font-size: 0.72rem; font-weight: 700; color: #10b981; display: flex; align-items: center; gap: 4px;">
+            <span class="pulse-dot" style="width: 7px; height: 7px;"></span> Live stream
+          </span>
+        </div>
+        <div class="terminal-box">
+          <div class="terminal-controls">
+            <button class="terminal-btn" id="btn-copy-logs">
+              <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Salin Log
+            </button>
+            <button class="terminal-btn" id="btn-clear-logs">
+              <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i> Bersihkan
+            </button>
+          </div>
+          <div class="terminal-content" id="logs-container">
+            <!-- Logs appear here dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    const uptimeVal = document.getElementById('uptime-val');
+    const memoryVal = document.getElementById('memory-val');
+    const cmdCountVal = document.getElementById('cmd-count-val');
+    const pollIntervalVal = document.getElementById('poll-interval-val');
+    const routersList = document.getElementById('routers-list');
+    const routerCountBadge = document.getElementById('router-count');
+    const logsContainer = document.getElementById('logs-container');
+    const btnClearLogs = document.getElementById('btn-clear-logs');
+    const btnCopyLogs = document.getElementById('btn-copy-logs');
+
+    let startTime = Date.now();
+    let commandRunCount = 0;
+
+    // Format uptime timer
+    setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const hours = String(Math.floor(elapsed / 3600000)).padStart(2, '0');
+      const mins = String(Math.floor((elapsed % 3600000) / 60000)).padStart(2, '0');
+      const secs = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0');
+      uptimeVal.textContent = `${hours}:${mins}:${secs}`;
+    }, 1000);
+
+    // Fetch Status & Routers
+    async function fetchStatus() {
+      try {
+        const res = await fetch('/api/status');
+        if (!res.ok) throw new Error('Ralat memuat status');
+        const data = await res.json();
+
+        // Update stats
+        memoryVal.textContent = data.stats.memory;
+        pollIntervalVal.textContent = (data.stats.pollInterval / 1000) + 's';
+        cmdCountVal.textContent = data.stats.totalCommands;
+        commandRunCount = data.stats.totalCommands;
+
+        // Render Routers
+        routersList.innerHTML = '';
+        routerCountBadge.textContent = `${data.routers.length} Router`;
+
+        if (data.routers.length === 0) {
+          routersList.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.85rem;">
+              <i data-lucide="alert-circle" style="margin: 0 auto 12px; width: 32px; height: 32px;"></i>
+              Tiada router ditemui dalam database Supabase.
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        data.routers.forEach(router => {
+          const isCached = data.cachedConnections.includes(`${router.ip_address}:${router.username}`);
+          const card = document.createElement('div');
+          card.className = 'router-card';
+          card.innerHTML = `
+            <div class="router-meta">
+              <div>
+                <div class="router-name">${router.name}</div>
+                <div class="router-ip">
+                  <i data-lucide="hash" style="width: 12px; height: 12px;"></i> ${router.ip_address}
+                </div>
+              </div>
+              <span class="router-badge ${isCached ? 'badge-connected' : 'badge-disconnected'}">
+                ${isCached ? 'Aktif' : 'Sedia'}
+              </span>
+            </div>
+            
+            <button class="test-btn" id="btn-test-${router.id}" onclick="testConnection('${router.id}')">
+              <i data-lucide="activity" style="width: 14px; height: 14px;"></i> Uji Sambungan API
+            </button>
+            <div class="test-result-bar" id="res-${router.id}"></div>
+          `;
+          routersList.appendChild(card);
+        });
+
+        lucide.createIcons();
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Test Connection Action
+    async function testConnection(routerId) {
+      const btn = document.getElementById(`btn-test-${routerId}`);
+      const resBar = document.getElementById(`res-${routerId}`);
+      
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="animate-spin" style="width: 14px; height: 14px;"></i> Menguji...`;
+      lucide.createIcons();
+
+      resBar.style.display = 'none';
+
+      try {
+        const response = await fetch('/api/test-connection', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: routerId })
+        });
+        
+        const data = await response.json();
+
+        resBar.style.display = 'flex';
+        if (response.ok && data.success) {
+          resBar.className = 'test-result-bar res-success';
+          resBar.innerHTML = `<i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Berjaya! Ping ke API MikroTik OK (~${data.latency}ms)`;
+          // Refresh status to show cached connection state
+          setTimeout(fetchStatus, 500);
+        } else {
+          resBar.className = 'test-result-bar res-error';
+          resBar.innerHTML = `<i data-lucide="x-circle" style="width: 14px; height: 14px;"></i> Gagal: ${data.message || 'Ralat sambungan'}`;
+        }
+      } catch (err) {
+        resBar.style.display = 'flex';
+        resBar.className = 'test-result-bar res-error';
+        resBar.innerHTML = `<i data-lucide="x-circle" style="width: 14px; height: 14px;"></i> Ralat: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="activity" style="width: 14px; height: 14px;"></i> Uji Sambungan API`;
+        lucide.createIcons();
+      }
+    }
+
+    // Append single log line to terminal
+    function appendLog(log) {
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      const timeStr = new Date(log.timestamp).toLocaleTimeString('ms-MY', { hour12: false });
+      
+      let badgeClass = 'log-badge-info';
+      if (log.type === 'system') badgeClass = 'log-badge-system';
+      else if (log.type === 'success') badgeClass = 'log-badge-success';
+      else if (log.type === 'command') badgeClass = 'log-badge-command';
+      else if (log.type === 'error') badgeClass = 'log-badge-error';
+
+      line.innerHTML = `
+        <span class="log-time">${timeStr}</span>
+        <span class="log-badge ${badgeClass}">${log.type}</span>
+        <span class="log-text">${escapeHtml(log.message)}</span>
+      `;
+      
+      logsContainer.appendChild(line);
+      logsContainer.scrollTop = logsContainer.scrollHeight;
+
+      // Update total processed commands live
+      if (log.type === 'command') {
+        commandRunCount++;
+        cmdCountVal.textContent = commandRunCount;
+      }
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Real-Time Log SSE Stream
+    function initLogsStream() {
+      // Load initial past logs
+      fetch('/api/logs')
+        .then(res => res.json())
+        .then(initialLogs => {
+          logsContainer.innerHTML = '';
+          initialLogs.forEach(appendLog);
+        })
+        .catch(console.error);
+
+      // Start EventSource stream
+      const source = new EventSource('/api/logs/stream');
+      
+      source.onmessage = (event) => {
+        const log = JSON.parse(event.data);
+        appendLog(log);
+      };
+
+      source.onerror = (err) => {
+        console.error('SSE Stream error, reconnecting...', err);
+        source.close();
+        setTimeout(initLogsStream, 4000);
+      };
+    }
+
+    // Buttons
+    btnClearLogs.addEventListener('click', () => {
+      logsContainer.innerHTML = '';
+    });
+
+    btnCopyLogs.addEventListener('click', () => {
+      const text = Array.from(logsContainer.querySelectorAll('.log-line'))
+        .map(el => {
+          const time = el.querySelector('.log-time').textContent;
+          const badge = el.querySelector('.log-badge').textContent.toUpperCase();
+          const msg = el.querySelector('.log-text').textContent;
+          return `[${time}] [${badge}] ${msg}`;
+        })
+        .join('\n');
+      
+      navigator.clipboard.writeText(text)
+        .then(() => alert('Log disalin ke clipboard!'))
+        .catch(console.error);
+    });
+
+    // Start Everything
+    fetchStatus();
+    initLogsStream();
+    setInterval(fetchStatus, 10000); // Dynamic status refresh every 10s
+  </script>
+</body>
+</html>

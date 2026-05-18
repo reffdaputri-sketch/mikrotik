@@ -2,6 +2,8 @@ require('dotenv').config()
 const { createClient } = require('@supabase/supabase-js')
 const { RouterOSAPI } = require('node-routeros')
 const ws = require('ws')
+const express = require('express')
+const path = require('path')
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -17,15 +19,41 @@ const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '5000')
 // Cache koneksi router aktif
 const routerConnections = {}
 
-console.log('🤖 NuxBill MikroTik Agent starting...')
-console.log(`📡 Polling Supabase every ${POLL_INTERVAL}ms`)
+// UI Logger & Real-time SSE Stream
+const maxLogs = 150
+const agentLogs = []
+const sseClients = new Set()
+let totalCommandsCount = 0
+
+function logToUI(type, message) {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    type, // 'system', 'success', 'command', 'error', 'info'
+    message
+  }
+  agentLogs.push(logEntry)
+  if (agentLogs.length > maxLogs) agentLogs.shift()
+
+  // Console Output
+  const prefix = type === 'system' ? '🤖' : type === 'success' ? '✅' : type === 'command' ? '📋' : '❌'
+  console.log(`${prefix} ${message}`)
+
+  // Stream to SSE clients
+  const sseData = `data: ${JSON.stringify(logEntry)}\n\n`
+  for (const client of sseClients) {
+    client.write(sseData)
+  }
+}
+
+logToUI('system', 'NuxBill MikroTik Agent starting...')
+logToUI('system', `Polling Supabase every ${POLL_INTERVAL}ms`)
 
 async function getRouterConnection(router) {
   // SIMULATION MODE
   if (process.env.SIMULATION_MODE === 'true' || router.ip_address === '127.0.0.1') {
     return {
       write: async (args) => {
-        console.log('🧪 [SIMULATION] Executing command:', args)
+        logToUI('command', `[SIMULATION] Executing command: ${JSON.stringify(args)}`)
         if (args[0] && args[0].includes('print')) {
           return [{ '.id': '*SIMULATED' }]
         }
@@ -54,7 +82,7 @@ async function getRouterConnection(router) {
 
   await conn.connect()
   routerConnections[key] = conn
-  console.log(`✅ Connected to router: ${router.name} (${host})`)
+  logToUI('success', `Connected to router: ${router.name} (${host})`)
   return conn
 }
 
@@ -252,7 +280,7 @@ async function processCommands() {
       .limit(10)
 
     if (error) {
-      console.error('❌ Supabase error:', error.message)
+      logToUI('error', `Supabase error: ${error.message}`)
       return
     }
 
@@ -269,7 +297,7 @@ async function processCommands() {
 
     if (!commands || commands.length === 0) return
 
-    console.log(`📋 Processing ${commands.length} command(s)...`)
+    logToUI('system', `Processing ${commands.length} command(s)...`)
 
     for (const cmd of commands) {
       // Mark as processing
@@ -295,7 +323,8 @@ async function processCommands() {
           })
           .eq('id', cmd.id)
 
-        console.log(`✅ Command done: [${cmd.command}] for router ${router.name}`)
+        totalCommandsCount++
+        logToUI('success', `Command done: [${cmd.command}] for router ${router.name}`)
 
         // Update router last_seen + status Online
         await supabase
@@ -304,7 +333,7 @@ async function processCommands() {
           .eq('id', router.id)
 
       } catch (err) {
-        console.error(`❌ Command failed [${cmd.command}]:`, err.message)
+        logToUI('error', `Command failed [${cmd.command}]: ${err.message}`)
 
         // Mark as error
         await supabase
@@ -324,11 +353,96 @@ async function processCommands() {
       }
     }
   } catch (err) {
-    console.error('❌ Poll error:', err.message)
+    logToUI('error', `Poll error: ${err.message}`)
   }
 }
 
-// Start polling
-console.log('🚀 Agent running! Waiting for commands...\n')
+// Start Polling
+logToUI('system', 'Agent running! Waiting for commands...')
 setInterval(processCommands, POLL_INTERVAL)
 processCommands() // Run immediately on start
+
+// ── EXPRESS SERVER & DASHBOARD API ──
+const app = express()
+const PORT = process.env.AGENT_PORT || 3002
+
+app.use(express.json())
+app.use(express.static(path.join(__dirname, 'public')))
+
+// GET /api/status - Returns active stats and router connections
+app.get('/api/status', async (req, res) => {
+  try {
+    const { data: routers } = await supabase.from('routers').select('*')
+    const activeKeys = Object.keys(routerConnections)
+    
+    const stats = {
+      uptime: Math.floor(process.uptime()),
+      memory: (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + ' MB',
+      totalCommands: totalCommandsCount,
+      pollInterval: POLL_INTERVAL
+    }
+    
+    res.json({
+      routers: routers || [],
+      cachedConnections: activeKeys,
+      stats
+    })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// GET /api/logs - Returns all past logs
+app.get('/api/logs', (req, res) => {
+  res.json(agentLogs)
+})
+
+// GET /api/logs/stream - Server-Sent Events stream for real-time console updates
+app.get('/api/logs/stream', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  res.flushHeaders()
+
+  sseClients.add(res)
+
+  req.on('close', () => {
+    sseClients.delete(res)
+  })
+})
+
+// POST /api/test-connection - Test MikroTik connection on demand
+app.post('/api/test-connection', async (req, res) => {
+  const { id } = req.body
+  try {
+    const { data: router, error } = await supabase
+      .from('routers')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error || !router) {
+      return res.status(404).json({ success: false, message: 'Router tidak ditemui' })
+    }
+
+    logToUI('system', `🧪 Memulakan ujian sambungan ke router: ${router.name} (${router.ip_address})`)
+    
+    const startTime = Date.now()
+    const api = await getRouterConnection(router)
+    
+    // Ping dengan melakukan pembacaan identitas mikroTik
+    await api.write(['/system/identity/print'])
+    
+    const latency = Date.now() - startTime
+    
+    logToUI('success', `✅ Ujian sambungan berjaya untuk ${router.name}! Latensi: ${latency}ms`)
+    res.json({ success: true, latency })
+  } catch (err) {
+    logToUI('error', `❌ Ujian sambungan gagal untuk router ID ${id}: ${err.message}`)
+    res.status(500).json({ success: false, message: err.message })
+  }
+})
+
+app.listen(PORT, '0.0.0.0', () => {
+  logToUI('success', `Dashboard UI available at: http://localhost:${PORT}`)
+})
