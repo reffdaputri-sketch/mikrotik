@@ -28,9 +28,8 @@ export async function createToyyibpayBill(params: {
   formData.append('billDescription', params.billDescription)
   formData.append('billPriceSetting', '1') // Fixed price
   formData.append('billPayorInfo', '1') // Fixed info
-  // toyyibPay expects amount in cents (e.g. RM 1.00 = 100)
-  const amountInCents = Math.round(params.billAmount * 100)
-  formData.append('billAmount', amountInCents.toString())
+  // toyyibPay expects amount in RM (e.g. 10.00)
+  formData.append('billAmount', params.billAmount.toFixed(2))
   formData.append('billReturnUrl', params.returnUrl)
   formData.append('billCallbackUrl', params.callbackUrl)
   formData.append('billExternalReferenceNo', params.externalReferenceNo)
@@ -67,7 +66,7 @@ export async function createToyyibpayBill(params: {
 
   return {
     success: false,
-    error: data
+    error: typeof data === 'object' ? JSON.stringify(data) : data
   }
 }
 

@@ -80,7 +80,16 @@ async function getRouterConnection(router) {
     port,
     user: router.username,
     password: router.password,
-    timeout: 10,
+    timeout: 0,
+  })
+
+  conn.on('error', (err) => {
+    logToUI('error', `Router connection error (${host}): ${err.message}`)
+    delete routerConnections[key]
+  })
+  conn.on('timeout', () => {
+    delete routerConnections[key]
+    conn.close().catch(() => {})
   })
 
   await conn.connect()
@@ -232,9 +241,9 @@ async function executeCommand(api, command, payload) {
 
     case 'sync_mikrotik_profile': {
       if (payload.type === 'Hotspot') {
-        const profiles = await api.write(['/ip/hotspot/user-profile/print', `?name=${payload.name}`])
+        const profiles = await api.write(['/ip/hotspot/user/profile/print', `?name=${payload.name}`])
         const args = [
-          (profiles && profiles.length > 0) ? '/ip/hotspot/user-profile/set' : '/ip/hotspot/user-profile/add',
+          (profiles && profiles.length > 0) ? '/ip/hotspot/user/profile/set' : '/ip/hotspot/user/profile/add',
           ...(profiles && profiles.length > 0 ? [`=.id=${profiles[0]['.id']}`] : [`=name=${payload.name}`]),
           `=rate-limit=${payload.rate_limit || ''}`,
           '=status-autorefresh=1m',

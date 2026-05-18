@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PurnamaWiFi - Status Koneksi</title>
+    <!-- Outfit Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            color: #f8fafc;
+        }
+        /* Aurora Glowing Circles */
+        .aurora {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            z-index: 0;
+            animation: float 10s ease-in-out infinite alternate;
+        }
+        .aurora-1 {
+            background: #4f46e5;
+            top: 10%;
+            left: 10%;
+        }
+        .aurora-2 {
+            background: #06b6d4;
+            bottom: 10%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(50px) scale(1.2); }
+        }
+        /* Glass Card */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+        .status-badge {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .brand-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        .tagline {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 5px;
+            margin-bottom: 30px;
+        }
+        .stats-table {
+            width: 100%;
+            margin-bottom: 30px;
+            border-collapse: collapse;
+        }
+        .stats-row {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .stats-row:last-child {
+            border-bottom: none;
+        }
+        .stats-label {
+            text-align: left;
+            padding: 12px 0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .stats-value {
+            text-align: right;
+            padding: 12px 0;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .btn-logout {
+            width: 100%;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 16px;
+            border-radius: 14px;
+            color: #fca5a5;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #ef4444;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+
+    <div class="card">
+        <div class="status-badge">Terkoneksi</div>
+        <div class="brand-name">PURNAMAWIFI</div>
+        <div class="tagline">Selamat menikmati layanan kami</div>
+
+        <table class="stats-table">
+            <tr class="stats-row">
+                <td class="stats-label">Username</td>
+                <td class="stats-value">$(username)</td>
+            </tr>
+            <tr class="stats-row">
+                <td class="stats-label">IP Address</td>
+                <td class="stats-value">$(ip)</td>
+            </tr>
+            <tr class="stats-row">
+                <td class="stats-label">Telah Terhubung</td>
+                <td class="stats-value">$(uptime)</td>
+            </tr>
+            $(if session-time-left)
+            <tr class="stats-row">
+                <td class="stats-label">Sisa Waktu</td>
+                <td class="stats-value">$(session-time-left)</td>
+            </tr>
+            $(endif)
+            <tr class="stats-row">
+                <td class="stats-label">Bytes Download</td>
+                <td class="stats-value">$(bytes-out-nice)</td>
+            </tr>
+        </table>
+
+        <form action="$(link-logout)" name="logout" onSubmit="return confirm('Apakah Anda yakin ingin memutus koneksi?')">
+            <button class="btn-logout" type="submit">Putuskan Koneksi</button>
+        </form>
+    </div>
+</body>
+</html>
