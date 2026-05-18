@@ -797,9 +797,7 @@
       };
 
       source.onerror = (err) => {
-        console.error('SSE Stream error, reconnecting...', err);
-        source.close();
-        setTimeout(initLogsStream, 4000);
+        console.warn('SSE Stream connection lost, browser will attempt reconnection automatically...', err);
       };
     }
 

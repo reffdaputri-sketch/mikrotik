@@ -42,6 +42,9 @@ function logToUI(type, message) {
   const sseData = `data: ${JSON.stringify(logEntry)}\n\n`
   for (const client of sseClients) {
     client.write(sseData)
+    if (client.flush) {
+      client.flush()
+    }
   }
 }
 
@@ -165,7 +168,9 @@ async function executeCommand(api, command, payload) {
         `?name=${payload.username}`,
       ])
       if (secrets && secrets.length > 0) {
-        await api.write(['/ppp/secret/set', `=.id=${secrets[0]['.id']}`, '=disabled=no'])
+        const setArgs = ['/ppp/secret/set', `=.id=${secrets[0]['.id']}`, '=disabled=no']
+        if (payload.comment) setArgs.push(`=comment=${payload.comment}`)
+        await api.write(setArgs)
       }
       return { enabled: true }
     }
@@ -207,7 +212,9 @@ async function executeCommand(api, command, payload) {
     case 'enable_hotspot_user': {
       const users = await api.write(['/ip/hotspot/user/print', `?name=${payload.username}`])
       if (users && users.length > 0) {
-        await api.write(['/ip/hotspot/user/set', `=.id=${users[0]['.id']}`, '=disabled=no'])
+        const setArgs = ['/ip/hotspot/user/set', `=.id=${users[0]['.id']}`, '=disabled=no']
+        if (payload.comment) setArgs.push(`=comment=${payload.comment}`)
+        await api.write(setArgs)
       }
       return { enabled: true }
     }
@@ -439,8 +446,9 @@ app.get('/api/logs', (req, res) => {
 // GET /api/logs/stream - Server-Sent Events stream for real-time console updates
 app.get('/api/logs/stream', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream')
-  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Cache-Control', 'no-cache, no-transform')
   res.setHeader('Connection', 'keep-alive')
+  res.setHeader('X-Accel-Buffering', 'no')
   res.flushHeaders()
 
   sseClients.add(res)
@@ -449,6 +457,16 @@ app.get('/api/logs/stream', (req, res) => {
     sseClients.delete(res)
   })
 })
+
+// Keep SSE connections active with a 15-second heartbeat
+setInterval(() => {
+  for (const client of sseClients) {
+    client.write(': keep-alive\n\n')
+    if (client.flush) {
+      client.flush()
+    }
+  }
+}, 15000)
 
 // POST /api/test-connection - Test MikroTik connection on demand
 app.post('/api/test-connection', async (req, res) => {
