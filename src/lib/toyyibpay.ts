@@ -39,6 +39,12 @@ export async function createToyyibpayBill(params: {
   formData.append('billPhone', params.billPhone)
   // formData.append('billPaymentChannel', '0') // Kita cuba buang ni supaya ToyyibPay pilih auto
 
+  console.log('--- TOYYIBPAY CREATE BILL REQUEST ---', {
+    billName: params.billName.slice(0, 30),
+    billAmount: params.billAmount,
+    amountInCents
+  })
+
   const response = await fetch(`${TOYYIBPAY_CONFIG.apiUrl}/createBill`, {
     method: 'POST',
     body: formData
