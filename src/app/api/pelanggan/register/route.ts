@@ -63,7 +63,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Gagal mendaftar. Sila cuba lagi.' }, { status: 500 })
     }
 
-    // 4. Hantar Butiran Log Masuk via WhatsApp secara automatik
+    // 4. Hantar Butiran Log Masuk via WhatsApp secara automatik (DIMATIKAN SEMENTARA MENCEGAH BUG BROADCAST WA SERVER)
+    /*
     const welcomeMessage = 
       `🎉 *PENDAFTARAN BERJAYA (PURNAMA WIFI)* 🎉\n\n` +
       `Hai *${fullname}*,\n` +
@@ -82,10 +83,11 @@ export async function POST(request: Request) {
     if (!sent) {
       console.warn(`[REGISTER-WELCOME] Gagal hantar mesej selamat datang ke ${phonenumber}`)
     }
+    */
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Pendaftaran berjaya! Butiran akaun telah dihantar ke WhatsApp anda.',
+      message: 'Pendaftaran berjaya!',
       customer 
     })
 
