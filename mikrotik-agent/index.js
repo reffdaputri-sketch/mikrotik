@@ -284,17 +284,6 @@ async function processCommands() {
       return
     }
 
-    // --- HEARTBEAT: Update status semua router jadi Online ---
-    const { data: allRouters } = await supabase.from('routers').select('id, name, ip_address, username');
-    if (allRouters) {
-      for (const r of allRouters) {
-        await supabase
-          .from('routers')
-          .update({ last_seen: new Date().toISOString(), status: 'Online' })
-          .eq('id', r.id);
-      }
-    }
-
     if (!commands || commands.length === 0) return
 
     logToUI('system', `Processing ${commands.length} command(s)...`)
@@ -361,6 +350,47 @@ async function processCommands() {
 logToUI('system', 'Agent running! Waiting for commands...')
 setInterval(processCommands, POLL_INTERVAL)
 processCommands() // Run immediately on start
+
+// --- BACKGROUND HEARTBEAT (Every 60 seconds) ---
+async function runHeartbeat() {
+  try {
+    const { data: allRouters } = await supabase.from('routers').select('id')
+    if (allRouters) {
+      for (const r of allRouters) {
+        await supabase
+          .from('routers')
+          .update({ last_seen: new Date().toISOString(), status: 'Online' })
+          .eq('id', r.id)
+      }
+    }
+  } catch (err) {
+    // Fail silently in background
+  }
+}
+setInterval(runHeartbeat, 60000)
+runHeartbeat() // Run once on startup
+
+// --- SUPABASE REALTIME (Blazing-Fast instant command executor) ---
+supabase
+  .channel('public:mikrotik_command_queue')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'mikrotik_command_queue',
+      filter: 'status=eq.pending'
+    },
+    (payload) => {
+      logToUI('system', '⚡ [REALTIME] Perintah baru terdeteksi! Memproses...')
+      processCommands()
+    }
+  )
+  .subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+      logToUI('system', '📡 Supabase Realtime Aktif! Mendengar perintah instan (0ms delay)...')
+    }
+  })
 
 // ── EXPRESS SERVER & DASHBOARD API ──
 const app = express()
