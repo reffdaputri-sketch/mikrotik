@@ -24,7 +24,7 @@ export async function createToyyibpayBill(params: {
   const formData = new URLSearchParams()
   formData.append('userSecretKey', TOYYIBPAY_CONFIG.userSecretKey)
   formData.append('categoryCode', TOYYIBPAY_CONFIG.categoryCode)
-  formData.append('billName', params.billName)
+  formData.append('billName', params.billName.slice(0, 30))
   formData.append('billDescription', params.billDescription)
   formData.append('billPriceSetting', '1') // Fixed price
   formData.append('billPayorInfo', '1') // Fixed info
