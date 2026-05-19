@@ -82,7 +82,7 @@ export default function IsolirPage() {
         <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #f1f5f9' }}>
           <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '16px' }}>Butuh bantuan teknis atau konfirmasi manual?</p>
           <a 
-            href="https://wa.me/60123456789" 
+            href="https://wa.me/60104005969" 
             style={{ 
               color: '#16a34a', textDecoration: 'none', fontWeight: 700, fontSize: '14px',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'

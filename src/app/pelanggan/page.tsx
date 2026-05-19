@@ -638,7 +638,7 @@ export default function PelangganDashboard() {
                   <button 
                     onClick={() => {
                       const msg = `Halo Admin, saya telah buat bayaran manual.\n\n*Butiran Pembayaran:*\nNama: ${customer.fullname}\nUsername: ${customer.username}\nPakej: ${customer.plans?.name_plan}\nJumlah: ${formatCurrency(customer.plans?.price || 0)}\n\n_Mohon sahkan bayaran saya. Terma kasih._`;
-                      window.open(`https://wa.me/60123456789?text=${encodeURIComponent(msg)}`, '_blank');
+                      window.open(`https://wa.me/60104005969?text=${encodeURIComponent(msg)}`, '_blank');
                     }} 
                     style={{ 
                       width: '100%', padding: '14px', fontSize: '14px', fontWeight: 800, borderRadius: '14px', 
@@ -914,7 +914,7 @@ export default function PelangganDashboard() {
                     <button 
                       onClick={() => {
                         const msg = `Halo Admin, saya ingin Konfirmasi Top Up Manual.\n\n*Butiran:*\nNo. Invoice: #${manualOrderId}\nNama: ${customer.fullname}\nUsername: ${customer.username}\nJumlah: RM ${topupAmount}\n\n_Mohon setujui top up saya setelah cek mutasi. Terima kasih._`;
-                        window.open(`https://wa.me/60123456789?text=${encodeURIComponent(msg)}`, '_blank');
+                        window.open(`https://wa.me/60104005969?text=${encodeURIComponent(msg)}`, '_blank');
                       }} 
                       style={{ 
                         width: '100%', padding: '18px', borderRadius: '16px', 
