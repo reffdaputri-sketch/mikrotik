@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nuxbill.admin.nuxbill_admin_flutter",
+      "sha256_cert_fingerprints": [
+        "FA:2A:B2:7D:7B:64:98:97:5B:46:12:12:12:12:12:12:12:12:12:12:12:12:12:12:12:12:12:12:12:12:12:12"
+      ]
+    }
+  }
+]
