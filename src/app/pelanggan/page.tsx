@@ -631,7 +631,7 @@ export default function PelangganDashboard() {
                     <div style={{ background: 'white', padding: '12px', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
                       <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 700 }}>BANK ISLAM</div>
                       <div style={{ fontSize: '16px', fontWeight: 900, color: '#16a34a' }}>02075025251187</div>
-                      <div style={{ fontSize: '11px', color: '#64748b' }}>A.n ADY BIN SAHABUDDIN</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>ADY BIN SAHABUDDIN</div>
                     </div>
                   </div>
 
@@ -902,7 +902,7 @@ export default function PelangganDashboard() {
                       <div>
                         <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 800 }}>BANK ISLAM</div>
                         <div style={{ fontSize: '20px', fontWeight: 900, color: '#16a34a' }}>02075025251187</div>
-                        <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>A.n ADY BIN SAHABUDDIN</div>
+                        <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>ADY BIN SAHABUDDIN</div>
                       </div>
                     </div>
 
@@ -941,7 +941,7 @@ export default function PelangganDashboard() {
                           border: 'none', fontWeight: 700, cursor: proofFile ? 'pointer' : 'default'
                         }}
                       >
-                        {uploadingProof ? 'Mengunggah...' : '📤 UPLOAD BUKTI SEKARANG'}
+                        {uploadingProof ? 'Mengunggah...' : '📤 Muat Naik Bukti Resit Transfer Anda'}
                       </button>
                     </div>
 
