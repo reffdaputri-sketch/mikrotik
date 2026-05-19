@@ -629,9 +629,9 @@ export default function PelangganDashboard() {
                   
                   <div style={{ display: 'grid', gap: '10px', marginBottom: '20px' }}>
                     <div style={{ background: 'white', padding: '12px', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
-                      <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 700 }}>MAYBANK MALAYSIA</div>
-                      <div style={{ fontSize: '16px', fontWeight: 900, color: '#16a34a' }}>1234 5678 9012</div>
-                      <div style={{ fontSize: '11px', color: '#64748b' }}>A.n Purnama WiFi Technology</div>
+                      <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 700 }}>BANK ISLAM</div>
+                      <div style={{ fontSize: '16px', fontWeight: 900, color: '#16a34a' }}>02075025251187</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>A.n ADY BIN SAHABUDDIN</div>
                     </div>
                   </div>
 
@@ -899,15 +899,10 @@ export default function PelangganDashboard() {
                     <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>Silakan transfer tepat **RM {topupAmount}** ke rekening berikut:</p>
                     
                     <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '20px', border: '1px solid #e2e8f0', textAlign: 'left', marginBottom: '24px' }}>
-                      <div style={{ marginBottom: '16px' }}>
-                        <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 800 }}>BANK MAYBANK</div>
-                        <div style={{ fontSize: '20px', fontWeight: 900, color: '#16a34a' }}>1234 5678 9012</div>
-                        <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>A.n Purnama WiFi Technology</div>
-                      </div>
-                      <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '16px' }}>
-                        <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 800 }}>BANK CIMB</div>
-                        <div style={{ fontSize: '20px', fontWeight: 900, color: '#16a34a' }}>0987 6543 2109</div>
-                        <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>A.n Purnama WiFi Technology</div>
+                      <div>
+                        <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 800 }}>BANK ISLAM</div>
+                        <div style={{ fontSize: '20px', fontWeight: 900, color: '#16a34a' }}>02075025251187</div>
+                        <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>A.n ADY BIN SAHABUDDIN</div>
                       </div>
                     </div>
 
