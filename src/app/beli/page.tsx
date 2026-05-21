@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Wifi, MapPin, AlertTriangle, CheckCircle2, Copy } from 'lucide-react'
+import { Wifi, MapPin, AlertTriangle, CheckCircle2, Copy, LogIn, ShieldCheck } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function BeliVoucher() {
@@ -15,6 +15,7 @@ export default function BeliVoucher() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [customer, setCustomer] = useState<any>(null)
+  const [authChecked, setAuthChecked] = useState(false)
 
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371e3
@@ -34,6 +35,8 @@ export default function BeliVoucher() {
       setCustomer(c)
       setIsLoggedIn(true)
     }
+    setAuthChecked(true)
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
@@ -99,7 +102,80 @@ export default function BeliVoucher() {
     }
   }
 
+  if (loading && !authChecked) return (
+    <div style={{ minHeight: '100vh', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Nunito", system-ui, sans-serif' }}>
+      <div style={{ color: '#16a34a', fontSize: '22px', fontWeight: 800 }}>Sedang Memuatkan... 🌿</div>
+    </div>
+  )
+
+  // ── LOGIN GATE ──
+  if (authChecked && !isLoggedIn) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #14532d 0%, #15803d 40%, #16a34a 70%, #4ade80 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: '"Nunito", system-ui, sans-serif' }}>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap');
+          @keyframes float-gate { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+          @keyframes scale-in { from{transform:scale(0.85);opacity:0} to{transform:scale(1);opacity:1} }
+          .gate-card { animation: scale-in 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+          .login-btn { transition: all 0.2s cubic-bezier(0.68,-0.55,0.265,1.55); cursor: pointer; }
+          .login-btn:hover { transform: scale(1.05); }
+          .login-btn:active { transform: scale(0.96); }
+        `}</style>
+
+        <div className="gate-card" style={{ background: 'white', borderRadius: '36px', padding: '48px 36px', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 30px 60px rgba(0,0,0,0.25)', border: '4px solid rgba(255,255,255,0.8)' }}>
+          
+          {/* Icon */}
+          <div style={{ animation: 'float-gate 3s ease-in-out infinite' }}>
+            <div style={{ width: '90px', height: '90px', background: 'linear-gradient(135deg, #16a34a, #15803d)', borderRadius: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 8px 0 #14532d' }}>
+              <ShieldCheck color="white" size={48} strokeWidth={2.5} />
+            </div>
+          </div>
+
+          {/* Title */}
+          <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#14532d', marginBottom: '10px', lineHeight: 1.2 }}>
+            Login Dahulu Ya! 🔐
+          </h1>
+          <p style={{ color: '#166534', fontSize: '15px', fontWeight: 600, marginBottom: '28px', lineHeight: 1.6 }}>
+            Untuk membeli baucar, anda perlu log masuk ke akaun pelanggan terlebih dahulu.<br/>
+            <span style={{ color: '#16a34a', fontWeight: 800 }}>Voucher anda akan tersimpan otomatis!</span>
+          </p>
+
+          {/* Benefits */}
+          <div style={{ background: '#f0fdf4', borderRadius: '20px', padding: '20px', marginBottom: '28px', border: '2px solid #bbf7d0', textAlign: 'left' }}>
+            {[
+              '✅ Lihat semua voucher yang dibeli',
+              '✅ Guna saldo wallet untuk bayar',
+              '✅ Histori pembelian tersimpan',
+            ].map(txt => (
+              <div key={txt} style={{ fontSize: '14px', fontWeight: 700, color: '#166534', padding: '5px 0' }}>{txt}</div>
+            ))}
+          </div>
+
+          {/* Login Button */}
+          <a
+            href="/pelanggan"
+            className="login-btn"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+              background: '#ea580c', color: 'white', padding: '16px 32px', borderRadius: '50px',
+              fontSize: '17px', fontWeight: 900, textDecoration: 'none',
+              boxShadow: '0 6px 0 #c2410c', marginBottom: '14px'
+            }}
+          >
+            <LogIn size={20} strokeWidth={2.5} />
+            Login / Daftar Sekarang
+          </a>
+
+          <a href="/" style={{ color: '#16a34a', fontSize: '13px', fontWeight: 700, textDecoration: 'none' }}>
+            ← Kembali ke Halaman Utama
+          </a>
+        </div>
+      </div>
+    )
+  }
+
   if (loading) return (
+
     <div style={{ minHeight: '100vh', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Nunito", system-ui, sans-serif' }}>
       <div style={{ color: '#16a34a', fontSize: '22px', fontWeight: 800 }}>Sedang Memuatkan... 🌿</div>
     </div>
