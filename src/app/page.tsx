@@ -224,6 +224,9 @@ export default function LandingPage() {
           Purnama <span style={{ color: '#ea580c' }}>WiFi</span>
         </span>
         <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+          <a href="https://purnamawifi.net/purnamawifi.apk" target="_blank" rel="noopener noreferrer" className="bubbly-button" style={{ color: '#166534', fontWeight: 800, fontSize: '15px', textDecoration: 'none' }}>
+            Download APK
+          </a>
           <a href="#plans" className="bubbly-button" style={{ color: '#166534', fontWeight: 800, fontSize: '15px', textDecoration: 'none' }}>
             Pakej
           </a>
@@ -321,6 +324,30 @@ export default function LandingPage() {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── CTA DOWNLOAD APP ── */}
+      <section style={{ padding: '60px 20px', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{
+          background: 'white', maxWidth: '900px', margin: '0 auto',
+          borderRadius: '32px', padding: '40px',
+          border: '4px solid #bbf7d0', boxShadow: '0 10px 30px rgba(22,163,74,0.15)'
+        }}>
+          <h2 style={{ fontSize: '32px', fontWeight: 900, color: '#15803d', marginBottom: '12px' }}>
+            Aplikasi Purnama WiFi Kini Tersedia! 📱
+          </h2>
+          <p style={{ color: '#166534', fontSize: '18px', fontWeight: 600, marginBottom: '28px', maxWidth: '600px', margin: '0 auto 28px' }}>
+            Dapatkan pengalaman internet yang lebih lancar, pantau langganan anda, dan urus profil dengan mudah melalui aplikasi Android rasmi kami.
+          </p>
+          <a href="https://purnamawifi.net/purnamawifi.apk" target="_blank" rel="noopener noreferrer" className="bubbly-button" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            background: '#16a34a', color: 'white', padding: '16px 36px',
+            borderRadius: '50px', fontSize: '18px', fontWeight: 900,
+            textDecoration: 'none', boxShadow: '0 6px 0 #15803d'
+          }}>
+            Download APK Sekarang 🚀
+          </a>
         </div>
       </section>
 
