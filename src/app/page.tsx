@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Wifi, Zap, User, CheckCircle2, Calendar } from 'lucide-react'
+import { Wifi, Zap, User, CheckCircle2, Calendar, Home, Package, Ticket } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function LandingPage() {
@@ -205,6 +205,78 @@ export default function LandingPage() {
           opacity: 0.6;
           z-index: 0;
         }
+
+        /* ── NAVBAR DESKTOP LINKS ── */
+        .nav-desktop-links {
+          display: flex;
+          gap: 14px;
+          align-items: center;
+        }
+        @media (max-width: 640px) {
+          .nav-desktop-links { display: none; }
+          .nav-portal-btn { display: flex !important; }
+        }
+
+        /* ── BOTTOM NAV MOBILE ── */
+        .bottom-nav {
+          display: none;
+        }
+        @media (max-width: 640px) {
+          .bottom-nav {
+            display: flex;
+          }
+          /* Extra padding so content isn't hidden behind bottom nav */
+          body { padding-bottom: 80px; }
+        }
+
+        .bottom-nav-item {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          padding: 8px 4px;
+          text-decoration: none;
+          color: #15803d;
+          font-weight: 800;
+          font-size: 10px;
+          border-radius: 16px;
+          transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+          position: relative;
+        }
+        .bottom-nav-item:active { transform: scale(0.9); }
+        .bottom-nav-item.active {
+          color: #16a34a;
+          background: #dcfce7;
+        }
+        .bottom-nav-item.active svg {
+          filter: drop-shadow(0 2px 4px rgba(22,163,74,0.3));
+        }
+        .bottom-nav-item-portal {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          padding: 8px 4px;
+          text-decoration: none;
+          color: white;
+          font-weight: 800;
+          font-size: 10px;
+          border-radius: 16px;
+          transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+          background: #ea580c;
+          box-shadow: 0 4px 0 #c2410c;
+          margin: 8px 4px;
+        }
+        .bottom-nav-item-portal:active { transform: scale(0.9); box-shadow: 0 2px 0 #c2410c; }
+
+        @keyframes bottom-nav-in {
+          from { transform: translateY(100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
       `}</style>
 
       {/* Floating clouds */}
@@ -214,16 +286,19 @@ export default function LandingPage() {
 
       {/* ── NAVBAR ── */}
       <nav style={{
-        padding: '14px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         position: 'fixed', top: 0, width: '100%', zIndex: 100,
-        background: 'rgba(240,253,244,0.85)', backdropFilter: 'blur(12px)',
+        background: 'rgba(240,253,244,0.92)', backdropFilter: 'blur(12px)',
         borderBottom: '3px solid #bbf7d0', boxShadow: '0 2px 12px rgba(22,163,74,0.08)',
         boxSizing: 'border-box'
       }}>
-        <span style={{ fontSize: '26px', fontWeight: 900, color: '#16a34a', letterSpacing: '-0.5px' }}>
+        {/* Logo */}
+        <span style={{ fontSize: '22px', fontWeight: 900, color: '#16a34a', letterSpacing: '-0.5px', whiteSpace: 'nowrap' }}>
           Purnama <span style={{ color: '#ea580c' }}>WiFi</span>
         </span>
-        <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+
+        {/* Desktop Links — hidden on mobile via CSS */}
+        <div className="nav-desktop-links">
           <a href="https://purnamawifi.net/purnamawifi.apk" target="_blank" rel="noopener noreferrer" className="bubbly-button" style={{ color: '#166534', fontWeight: 800, fontSize: '15px', textDecoration: 'none' }}>
             Download APK
           </a>
@@ -238,6 +313,51 @@ export default function LandingPage() {
             <User size={16} strokeWidth={3} /> Portal
           </a>
         </div>
+
+        {/* Mobile: only show Portal button */}
+        <a
+          href="/pelanggan"
+          className="bubbly-button nav-portal-btn"
+          style={{
+            display: 'none', // shown via CSS on mobile
+            background: '#ea580c', color: 'white', padding: '9px 18px', borderRadius: '50px',
+            fontSize: '13px', fontWeight: 800, alignItems: 'center', gap: '6px',
+            boxShadow: '0 3px 0 #c2410c', textDecoration: 'none', whiteSpace: 'nowrap'
+          }}
+        >
+          <User size={14} strokeWidth={3} /> Portal
+        </a>
+      </nav>
+
+      {/* ── BOTTOM NAVIGATION (Mobile Only) ── */}
+      <nav
+        className="bottom-nav"
+        style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
+          background: 'rgba(240,253,244,0.96)', backdropFilter: 'blur(16px)',
+          borderTop: '3px solid #bbf7d0',
+          boxShadow: '0 -4px 20px rgba(22,163,74,0.15)',
+          padding: '4px 8px',
+          paddingBottom: 'calc(4px + env(safe-area-inset-bottom))',
+          animation: 'bottom-nav-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        }}
+      >
+        <a href="/" className="bottom-nav-item active">
+          <Home size={22} strokeWidth={2.5} color="#16a34a" />
+          Utama
+        </a>
+        <a href="#plans" className="bottom-nav-item">
+          <Package size={22} strokeWidth={2.5} color="#15803d" />
+          Pakej
+        </a>
+        <a href="/beli" className="bottom-nav-item">
+          <Ticket size={22} strokeWidth={2.5} color="#15803d" />
+          Baucar
+        </a>
+        <a href="/pelanggan" className="bottom-nav-item-portal">
+          <User size={20} strokeWidth={2.5} />
+          Portal
+        </a>
       </nav>
 
       {/* ── HERO ── */}
