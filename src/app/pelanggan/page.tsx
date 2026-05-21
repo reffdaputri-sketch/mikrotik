@@ -379,6 +379,17 @@ export default function PelangganDashboard() {
         @media (min-width: 641px) {
           .bottom-nav { display: none !important; }
         }
+        /* Profile card responsive */
+        .profile-name { font-size: clamp(15px, 4vw, 20px) !important; }
+        .profile-meta { font-size: clamp(11px, 3vw, 14px) !important; }
+        .profile-badge { font-size: clamp(10px, 2.5vw, 12px) !important; padding: clamp(4px,1vw,6px) clamp(8px,2vw,12px) !important; }
+        .info-label { font-size: clamp(10px, 2.5vw, 12px) !important; }
+        .info-value { font-size: clamp(13px, 3.5vw, 17px) !important; }
+        .info-card { padding: clamp(12px, 3vw, 16px) !important; }
+        @media (max-width: 380px) {
+          .profile-card-inner { gap: 10px !important; }
+          .profile-avatar { width: 44px !important; height: 44px !important; }
+        }
       `}</style>
       {/* Navbar */}
       <nav style={{ 
@@ -441,52 +452,53 @@ export default function PelangganDashboard() {
           boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)',
           border: '1px solid #dcfce7'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-            <div style={{ 
-              width: '56px', height: '56px', borderRadius: '18px', 
+          <div className="profile-card-inner" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <div className="profile-avatar" style={{ 
+              width: '50px', height: '50px', borderRadius: '16px', flexShrink: 0,
               background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center',
               border: '2px solid #dcfce7'
             }}>
-              <User color="#16a34a" size={28} />
+              <User color="#16a34a" size={24} />
             </div>
-            <div>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: 0 }}>{customer.fullname}</h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '14px', color: '#6b7280' }}>@{customer.username}</span>
-                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d1d5db' }}></span>
-                <span style={{ fontSize: '14px', color: '#16a34a', fontWeight: 600 }}>Pelanggan PPPoE</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h2 className="profile-name" style={{ fontSize: '18px', fontWeight: 800, color: '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{customer.fullname}</h2>
+              <div className="profile-meta" style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '13px', color: '#6b7280' }}>@{customer.username}</span>
+                <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#d1d5db', flexShrink: 0 }}></span>
+                <span style={{ fontSize: '13px', color: '#16a34a', fontWeight: 600 }}>{customer.service_type === 'PPPoE' ? 'Pelanggan PPPoE' : 'Pelanggan Hotspot'}</span>
               </div>
             </div>
-            <div style={{ marginLeft: 'auto' }}>
-              <span style={{ 
-                padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700,
+            <div style={{ flexShrink: 0 }}>
+              <span className="profile-badge" style={{ 
+                padding: '5px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700,
                 background: needsRenewal ? '#fef2f2' : '#f0fdf4',
                 color: needsRenewal ? '#b91c1c' : '#166534',
-                border: `1px solid ${needsRenewal ? '#fee2e2' : '#dcfce7'}`
+                border: `1px solid ${needsRenewal ? '#fee2e2' : '#dcfce7'}`,
+                whiteSpace: 'nowrap'
               }}>
-                {needsRenewal ? 'Layanan Terputus' : 'Layanan Aktif'}
+                {needsRenewal ? 'Terputus' : 'Aktif'}
               </span>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '18px', border: '1px solid #f3f4f6' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280', fontSize: '12px', marginBottom: '6px', fontWeight: 600 }}>
-                <Clock size={14} style={{color: '#3b82f6'}} /> AKTIF SEHINGGA
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div className="info-card" style={{ background: '#f9fafb', padding: '14px', borderRadius: '16px', border: '1px solid #f3f4f6' }}>
+              <div className="info-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6b7280', fontSize: '11px', marginBottom: '5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                <Clock size={12} style={{color: '#3b82f6', flexShrink: 0}} /> Aktif Sehingga
               </div>
-              <div style={{ fontWeight: 800, fontSize: '17px', color: needsRenewal ? '#b91c1c' : '#111827' }}>
-                {customer.expired_at ? new Date(customer.expired_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Belum Aktif'}
+              <div className="info-value" style={{ fontWeight: 800, fontSize: '14px', color: needsRenewal ? '#b91c1c' : '#111827', lineHeight: 1.3 }}>
+                {customer.expired_at ? new Date(customer.expired_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Belum Aktif'}
               </div>
             </div>
-            <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '18px', border: '1px solid #f3f4f6' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6b7280', fontSize: '12px', marginBottom: '6px', fontWeight: 600 }}>
-                <Activity size={14} style={{color: '#10b981'}} /> PAKEJ SEMASA
+            <div className="info-card" style={{ background: '#f9fafb', padding: '14px', borderRadius: '16px', border: '1px solid #f3f4f6' }}>
+              <div className="info-label" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6b7280', fontSize: '11px', marginBottom: '5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                <Activity size={12} style={{color: '#10b981', flexShrink: 0}} /> Pakej Semasa
               </div>
-              <div style={{ fontWeight: 800, fontSize: '17px', color: '#111827' }}>
-                {customer?.plans?.name_plan || 'Tiada Paket Aktif'}
+              <div className="info-value" style={{ fontWeight: 800, fontSize: '14px', color: '#111827', lineHeight: 1.3 }}>
+                {customer?.plans?.name_plan || 'Tiada Pakej'}
                 {customer?.plans?.bandwidths && (
-                  <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: 700, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Zap size={10} /> {customer.plans.bandwidths.rate_down}{customer.plans.bandwidths.rate_down_unit} Kelajuan
+                  <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: 700, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                    <Zap size={9} />{customer.plans.bandwidths.rate_down}{customer.plans.bandwidths.rate_down_unit}
                   </div>
                 )}
               </div>
