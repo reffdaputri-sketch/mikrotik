@@ -54,27 +54,19 @@ export async function PUT(
       })
     }
 
-    // 2. Jika Paket (Plan) atau Password berubah
+    // 2. Jika plan atau password berubah, update di MikroTik
+    // (Kick user TIDAK dilakukan dari web — admin lakukan manual dari MikroTik jika perlu)
     if (body.plan_id || body.password) {
-      // Ambil nama plan untuk dijadikan nama profile di MikroTik
       const { data: plan } = await supabase.from('plans').select('name_plan').eq('id', body.plan_id).single()
-      
+
       await supabase.from('mikrotik_command_queue').insert({
         router_id: body.router_id,
         command: customer.service_type === 'PPPoE' ? 'update_pppoe_secret' : 'update_hotspot_user',
-        payload: { 
+        payload: {
           username: body.username,
           password: body.password || undefined,
           profile: plan?.name_plan || undefined
         },
-        status: 'pending',
-      })
-
-      // Kick user agar profil baru (speed) segera aktif
-      await supabase.from('mikrotik_command_queue').insert({
-        router_id: body.router_id,
-        command: customer.service_type === 'PPPoE' ? 'kick_pppoe_user' : 'kick_hotspot_user',
-        payload: { username: body.username },
         status: 'pending',
       })
     }
