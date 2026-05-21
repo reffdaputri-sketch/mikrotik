@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       billPhone: customer.phonenumber || '08123456789',
       externalReferenceNo: order_id,
       callbackUrl: `${appUrl}/api/webhook/toyyibpay`,
-      returnUrl: `${appUrl}/pelanggan` // Kembali ke dashboard pelanggan
+      returnUrl: `${appUrl}/payment-callback?order_id=${order_id}&status=success`
     })
 
     if (toyyibRes.success) {
