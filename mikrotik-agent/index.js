@@ -5,6 +5,13 @@ const ws = require('ws')
 const express = require('express')
 const path = require('path')
 
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err.message)
+})
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err.message)
+})
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -80,14 +87,17 @@ async function getRouterConnection(router) {
     port,
     user: router.username,
     password: router.password,
-    timeout: 0,
+    timeout: 30, // seconds
+    keepalive: true
   })
 
   conn.on('error', (err) => {
     logToUI('error', `Router connection error (${host}): ${err.message}`)
     delete routerConnections[key]
+    conn.close().catch(() => {})
   })
   conn.on('timeout', () => {
+    logToUI('error', `Router timeout (${host})`)
     delete routerConnections[key]
     conn.close().catch(() => {})
   })
