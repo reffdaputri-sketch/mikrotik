@@ -87,23 +87,23 @@ export async function GET(request: Request) {
         const planName = customer.plans?.name_plan || 'Pakej Internet'
         const price = customer.plans?.price || 0
 
-        // Deep link: buka app terus ke halaman bayar (intent:// untuk Android, https:// fallback PWA/iOS)
-        const appDeepLink = `https://purnamawifi.net/pelanggan`
-        const intentLink = `intent://pelanggan#Intent;scheme=purnamawifi;package=net.purnamawifi.app;S.browser_fallback_url=${encodeURIComponent(appDeepLink)};end`
+        // Deep link: buka app Purnama WiFi terus (package: com.nuxbill.admin.nuxbill_admin_flutter)
+        // intent:// format: Android Chrome akan buka app jika terinstall, fallback ke web jika tidak
+        const webFallback = `https://purnamawifi.net/pelanggan`
+        const appLink = `intent://pelanggan#Intent;scheme=purnamawifi;package=com.nuxbill.admin.nuxbill_admin_flutter;S.browser_fallback_url=${encodeURIComponent(webFallback)};end`
 
         const message = 
           `⚠️ *NOTIFIKASI TAMAT TEMPOH (PURNAMA WIFI)* ⚠️\n\n` +
           `Salam sejahtera *${customer.fullname}*,\n\n` +
-          `Makluman: Akaun internet PPPoE anda (*${customer.username}*) telah *TAMAT TEMPOH* pada *${expiryDate}*.\n\n` +
+          `Akaun internet PPPoE anda (*${customer.username}*) telah *TAMAT TEMPOH* pada *${expiryDate}*.\n\n` +
           `Pakej: *${planName}*\n` +
           `Jumlah Bayaran: *RM ${price}*\n\n` +
           `━━━━━━━━━━━━━━━\n` +
           `📲 *CARA BUAT BAYARAN:*\n\n` +
           `1️⃣ Buka aplikasi *Purnama WiFi* di telefon anda\n` +
-          `   Log masuk dengan:\n` +
-          `   👤 Username: *${customer.username}*\n\n` +
-          `2️⃣ Atau klik pautan di bawah untuk terus buka akaun anda:\n` +
-          `🔗 ${appDeepLink}\n\n` +
+          `   (Guna username: *${customer.username}*)\n\n` +
+          `2️⃣ Jika belum ada aplikasi, klik pautan ini:\n` +
+          `👉 ${webFallback}\n\n` +
           `━━━━━━━━━━━━━━━\n` +
           `Terima kasih kerana memilih Purnama WiFi! 🙏`
 
