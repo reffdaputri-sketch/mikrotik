@@ -87,10 +87,8 @@ export async function GET(request: Request) {
         const planName = customer.plans?.name_plan || 'Pakej Internet'
         const price = customer.plans?.price || 0
 
-        // Deep link: buka app Purnama WiFi terus (package: com.nuxbill.admin.nuxbill_admin_flutter)
-        // intent:// format: Android Chrome akan buka app jika terinstall, fallback ke web jika tidak
-        const webFallback = `https://purnamawifi.net/pelanggan`
-        const appLink = `intent://pelanggan#Intent;scheme=purnamawifi;package=com.nuxbill.admin.nuxbill_admin_flutter;S.browser_fallback_url=${encodeURIComponent(webFallback)};end`
+        // Custom scheme — terus buka app Purnama WiFi tanpa browser
+        const appLink = `purnamawifi://pelanggan`
 
         const message = 
           `⚠️ *NOTIFIKASI TAMAT TEMPOH (PURNAMA WIFI)* ⚠️\n\n` +
@@ -99,11 +97,10 @@ export async function GET(request: Request) {
           `Pakej: *${planName}*\n` +
           `Jumlah Bayaran: *RM ${price}*\n\n` +
           `━━━━━━━━━━━━━━━\n` +
-          `📲 *CARA BUAT BAYARAN:*\n\n` +
-          `1️⃣ Buka aplikasi *Purnama WiFi* di telefon anda\n` +
-          `   (Guna username: *${customer.username}*)\n\n` +
-          `2️⃣ Jika belum ada aplikasi, klik pautan ini:\n` +
-          `👉 ${webFallback}\n\n` +
+          `📲 *BUAT BAYARAN SEKARANG:*\n\n` +
+          `Klik pautan di bawah untuk buka aplikasi:\n` +
+          `👉 ${appLink}\n\n` +
+          `_(Pastikan aplikasi Purnama WiFi sudah dipasang)_\n\n` +
           `━━━━━━━━━━━━━━━\n` +
           `Terima kasih kerana memilih Purnama WiFi! 🙏`
 
