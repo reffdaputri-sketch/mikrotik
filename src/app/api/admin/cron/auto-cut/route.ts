@@ -86,19 +86,31 @@ export async function GET(request: Request) {
           : 'Tarikh Luput'
         const planName = customer.plans?.name_plan || 'Pakej Internet'
         const price = customer.plans?.price || 0
-        const message = `⚠️ *NOTIFIKASI TAMAT TEMPOH (PURNAMA WIFI)* ⚠️\n\n` +
+
+        // Deep link: buka app terus ke halaman bayar (intent:// untuk Android, https:// fallback PWA/iOS)
+        const appDeepLink = `https://purnamawifi.net/pelanggan`
+        const intentLink = `intent://pelanggan#Intent;scheme=purnamawifi;package=net.purnamawifi.app;S.browser_fallback_url=${encodeURIComponent(appDeepLink)};end`
+
+        const message = 
+          `⚠️ *NOTIFIKASI TAMAT TEMPOH (PURNAMA WIFI)* ⚠️\n\n` +
           `Salam sejahtera *${customer.fullname}*,\n\n` +
           `Makluman: Akaun internet PPPoE anda (*${customer.username}*) telah *TAMAT TEMPOH* pada *${expiryDate}*.\n\n` +
           `Pakej: *${planName}*\n` +
           `Jumlah Bayaran: *RM ${price}*\n\n` +
-          `Sila buat pembayaran segera bagi memastikan sambungan internet anda kekal aktif tanpa gangguan.\n\n` +
-          `Anda boleh membuat pembayaran secara atas talian di Portal Pelanggan kami:\n` +
-          `🔗 https://purnamawifi.net/pelanggan\n\n` +
+          `━━━━━━━━━━━━━━━\n` +
+          `📲 *CARA BUAT BAYARAN:*\n\n` +
+          `1️⃣ Buka aplikasi *Purnama WiFi* di telefon anda\n` +
+          `   Log masuk dengan:\n` +
+          `   👤 Username: *${customer.username}*\n\n` +
+          `2️⃣ Atau klik pautan di bawah untuk terus buka akaun anda:\n` +
+          `🔗 ${appDeepLink}\n\n` +
+          `━━━━━━━━━━━━━━━\n` +
           `Terima kasih kerana memilih Purnama WiFi! 🙏`
 
         const sent = await sendWhatsApp(customer.phonenumber, message)
         waStatus = sent ? 'WA Notified' : 'WA Failed'
       }
+
 
       results.push({ id: customer.id, username: customer.username, status: 'Cut-off & Invoice Generated', wa: waStatus })
     }
