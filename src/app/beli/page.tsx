@@ -373,14 +373,14 @@ export default function BeliVoucher() {
                 <CheckCircle2 color="white" size={32} />
               </div>
               
-              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#14532d', marginBottom: '8px' }}>Pilih Cara Bayar 💰</h3>
+              <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#14532d', marginBottom: '8px' }}>Pilih Cara Bayar 💳</h3>
               <p style={{ fontSize: '14px', color: '#166534', fontWeight: 600, marginBottom: '24px' }}>
                 Anda memilih pakej <span style={{ color: '#16a34a' }}>{selectedPlan?.name_plan}</span> seharga <span style={{ fontWeight: 800 }}>{formatCurrency(selectedPlan?.price || 0)}</span>
               </p>
               
               <div style={{ display: 'grid', gap: '12px' }}>
                 <button onClick={() => processOrder('online')} className="bubbly-button" style={{ width: '100%', padding: '16px', borderRadius: '50px', background: '#16a34a', color: 'white', fontWeight: 900, border: 'none', boxShadow: '0 4px 0 #15803d' }}>
-                  QRIS / Online Banking 💳
+                  Bayar Online Banking 💳
                 </button>
                 
                 <button 
@@ -394,12 +394,12 @@ export default function BeliVoucher() {
                     boxShadow: isLoggedIn ? '0 4px 0 #c2410c' : 'none' 
                   }}
                 >
-                  {isLoggedIn ? 'Guna Saldo Wallet 🏦' : 'Guna Saldo (Sila Login)'}
+                  {isLoggedIn ? 'Guna Saldo 🏦' : 'Guna Saldo (Sila Login)'}
                 </button>
               </div>
               
               <p style={{ marginTop: '20px', fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
-                {isLoggedIn ? `Baki Saldo Anda: ${formatCurrency(customer?.balance || 0)}` : 'Anda perlu masuk ke akaun pelanggan untuk guna baki saldo.'}
+                {isLoggedIn ? `Saldo anda: ${formatCurrency(customer?.balance || 0)}` : 'Log masuk dahulu untuk menggunakan saldo akaun anda.'}
               </p>
             </div>
           </div>
