@@ -446,6 +446,43 @@ export default function PelangganDashboard() {
 
         {activeTab === 'overview' && (
           <>
+            {/* Wallet Card */}
+            <div style={{
+              background: 'linear-gradient(135deg, #16a34a, #15803d)',
+              padding: '24px', borderRadius: '24px', marginBottom: '24px',
+              boxShadow: '0 10px 15px -3px rgba(22, 163, 74, 0.2)',
+              color: 'white', position: 'relative', overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.1 }}>
+                <CreditCard size={120} />
+              </div>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, opacity: 0.9 }}>Baki Wallet</span>
+                  <div style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>PREMIUM</div>
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: 900, marginBottom: '20px' }}>{formatCurrency(customer.balance || 0)}</div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button
+                    onClick={() => setShowTopupModal(true)}
+                    style={{
+                      flex: 1, padding: '12px', background: 'white', color: '#16a34a',
+                      border: 'none', borderRadius: '14px', fontWeight: 800, fontSize: '14px',
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                    }}
+                  >
+                    <Plus size={16} /> Tambah Nilai Wallet
+                  </button>
+                  <button style={{
+                    padding: '12px', background: 'rgba(255,255,255,0.2)', color: 'white',
+                    border: 'none', borderRadius: '14px', cursor: 'pointer'
+                  }}>
+                    <Activity size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Profile Card */}
             <div style={{
               background: 'white', padding: '28px', borderRadius: '24px', marginBottom: '24px',
@@ -502,43 +539,6 @@ export default function PelangganDashboard() {
                       </div>
                     )}
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Wallet Card */}
-            <div style={{
-              background: 'linear-gradient(135deg, #16a34a, #15803d)',
-              padding: '24px', borderRadius: '24px', marginBottom: '24px',
-              boxShadow: '0 10px 15px -3px rgba(22, 163, 74, 0.2)',
-              color: 'white', position: 'relative', overflow: 'hidden'
-            }}>
-              <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.1 }}>
-                <CreditCard size={120} />
-              </div>
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 600, opacity: 0.9 }}>Baki Wallet</span>
-                  <div style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>PREMIUM</div>
-                </div>
-                <div style={{ fontSize: '32px', fontWeight: 900, marginBottom: '20px' }}>{formatCurrency(customer.balance || 0)}</div>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button
-                    onClick={() => setShowTopupModal(true)}
-                    style={{
-                      flex: 1, padding: '12px', background: 'white', color: '#16a34a',
-                      border: 'none', borderRadius: '14px', fontWeight: 800, fontSize: '14px',
-                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
-                    }}
-                  >
-                    <Plus size={16} /> Tambah Nilai Wallet
-                  </button>
-                  <button style={{
-                    padding: '12px', background: 'rgba(255,255,255,0.2)', color: 'white',
-                    border: 'none', borderRadius: '14px', cursor: 'pointer'
-                  }}>
-                    <Activity size={18} />
-                  </button>
                 </div>
               </div>
             </div>
