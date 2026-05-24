@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     // 3. Cek apakah saldo cukup
     if (balance < price) {
-      return NextResponse.json({ error: `Saldo tidak mencukupi. Baki anda RM ${balance.toFixed(2)}` }, { status: 400 })
+      return NextResponse.json({ error: `Baki tidak mencukupi. Baki anda RM ${balance.toFixed(2)}` }, { status: 400 })
     }
 
     // --- PROSES TRANSAKSI ---

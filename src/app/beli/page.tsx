@@ -380,7 +380,7 @@ export default function BeliVoucher() {
               
               <div style={{ display: 'grid', gap: '12px' }}>
                 <button onClick={() => processOrder('online')} className="bubbly-button" style={{ width: '100%', padding: '16px', borderRadius: '50px', background: '#16a34a', color: 'white', fontWeight: 900, border: 'none', boxShadow: '0 4px 0 #15803d' }}>
-                  Bayar Online Banking 💳
+                  Online Banking 💳
                 </button>
                 
                 <button 
@@ -394,12 +394,12 @@ export default function BeliVoucher() {
                     boxShadow: isLoggedIn ? '0 4px 0 #c2410c' : 'none' 
                   }}
                 >
-                  {isLoggedIn ? 'Guna Saldo 🏦' : 'Guna Saldo (Sila Login)'}
+                  {isLoggedIn ? 'Pembelian e-Wallet 🏦' : 'Pembelian e-Wallet (Sila Login)'}
                 </button>
               </div>
               
               <p style={{ marginTop: '20px', fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
-                {isLoggedIn ? `Saldo anda: ${formatCurrency(customer?.balance || 0)}` : 'Log masuk dahulu untuk menggunakan saldo akaun anda.'}
+                {isLoggedIn ? `Baki Terkini Anda: ${formatCurrency(customer?.balance || 0)}` : 'Log masuk dahulu untuk menggunakan baki akaun anda.'}
               </p>
             </div>
           </div>
