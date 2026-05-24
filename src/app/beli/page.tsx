@@ -133,19 +133,19 @@ export default function BeliVoucher() {
 
           {/* Title */}
           <h1 style={{ fontSize: '26px', fontWeight: 900, color: '#14532d', marginBottom: '10px', lineHeight: 1.2 }}>
-            Login Dahulu Ya! 🔐
+            Log Masuk Dahulu Ya! 🔐
           </h1>
           <p style={{ color: '#166534', fontSize: '15px', fontWeight: 600, marginBottom: '28px', lineHeight: 1.6 }}>
             Untuk membeli baucar, anda perlu log masuk ke akaun pelanggan terlebih dahulu.<br/>
-            <span style={{ color: '#16a34a', fontWeight: 800 }}>Voucher anda akan tersimpan otomatis!</span>
+            <span style={{ color: '#16a34a', fontWeight: 800 }}>Baucar anda akan disimpan secara automatik!</span>
           </p>
 
           {/* Benefits */}
           <div style={{ background: '#f0fdf4', borderRadius: '20px', padding: '20px', marginBottom: '28px', border: '2px solid #bbf7d0', textAlign: 'left' }}>
             {[
-              '✅ Lihat semua voucher yang dibeli',
-              '✅ Guna saldo wallet untuk bayar',
-              '✅ Histori pembelian tersimpan',
+              '✅ Lihat semua baucar yang dibeli',
+              '✅ Guna baki e-Wallet untuk bayar',
+              '✅ Sejarah pembelian disimpan',
             ].map(txt => (
               <div key={txt} style={{ fontSize: '14px', fontWeight: 700, color: '#166534', padding: '5px 0' }}>{txt}</div>
             ))}
@@ -163,7 +163,7 @@ export default function BeliVoucher() {
             }}
           >
             <LogIn size={20} strokeWidth={2.5} />
-            Login / Daftar Sekarang
+            Log Masuk / Daftar Sekarang
           </a>
 
           <a href="/" style={{ color: '#16a34a', fontSize: '13px', fontWeight: 700, textDecoration: 'none' }}>
