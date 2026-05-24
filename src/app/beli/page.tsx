@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Wifi, MapPin, AlertTriangle, CheckCircle2, Copy, LogIn, ShieldCheck } from 'lucide-react'
+import { Wifi, MapPin, AlertTriangle, CheckCircle2, Copy, LogIn, ShieldCheck, Home, Tag } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function BeliVoucher() {
@@ -404,6 +404,30 @@ export default function BeliVoucher() {
             </div>
           </div>
         )}
+
+      {/* Bottom Navigation (Mobile Only) - Beli Voucher View */}
+      <div className="bottom-nav" style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)',
+        borderTop: '1px solid #dcfce7', height: '70px',
+        display: 'flex', justifyContent: 'space-around', alignItems: 'center',
+        zIndex: 1000, boxShadow: '0 -4px 12px rgba(0,0,0,0.05)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}>
+        <button
+          onClick={() => window.location.href = '/pelanggan'}
+          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: '#94a3b8', cursor: 'pointer' }}
+        >
+          <Home size={22} strokeWidth={2} />
+          <span style={{ fontSize: '11px', fontWeight: 500 }}>Utama</span>
+        </button>
+        <button
+          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: '#16a34a', cursor: 'pointer' }}
+        >
+          <Tag size={24} strokeWidth={2.5} />
+          <span style={{ fontSize: '11px', fontWeight: 800 }}>Voucher</span>
+        </button>
+      </div>
 
       </div>
     </div>

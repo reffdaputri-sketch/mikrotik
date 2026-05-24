@@ -544,28 +544,30 @@ export default function PelangganDashboard() {
             </div>
 
             {/* Banner Beli Voucher */}
-            <div
-              onClick={() => window.location.href = '/beli'}
-              style={{
-                background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-                padding: '24px', borderRadius: '24px', marginBottom: '24px',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                boxShadow: '0 10px 15px -3px rgba(22, 163, 74, 0.2)', cursor: 'pointer'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ width: '48px', height: '48px', background: 'rgba(255,255,255,0.2)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Tag color="white" size={24} />
+            {customer?.service_type !== 'PPPoE' && (
+              <div
+                onClick={() => window.location.href = '/beli'}
+                style={{
+                  background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                  padding: '24px', borderRadius: '24px', marginBottom: '24px',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  boxShadow: '0 10px 15px -3px rgba(22, 163, 74, 0.2)', cursor: 'pointer'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ width: '48px', height: '48px', background: 'rgba(255,255,255,0.2)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Tag color="white" size={24} />
+                  </div>
+                  <div>
+                    <div style={{ color: 'white', fontWeight: 800, fontSize: '18px' }}>Beli Baucar Hotspot</div>
+                    <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>Sesuai untuk rakan atau peranti tetamu.</div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ color: 'white', fontWeight: 800, fontSize: '18px' }}>Beli Baucar Hotspot</div>
-                  <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>Sesuai untuk rakan atau peranti tetamu.</div>
-                </div>
+                <button style={{ background: 'white', border: 'none', padding: '10px 20px', borderRadius: '50px', color: '#16a34a', fontWeight: 800, fontSize: '12px' }}>
+                  BELI &rarr;
+                </button>
               </div>
-              <button style={{ background: 'white', border: 'none', padding: '10px 20px', borderRadius: '50px', color: '#16a34a', fontWeight: 800, fontSize: '12px' }}>
-                BELI &rarr;
-              </button>
-            </div>
+            )}
 
             {/* Payment Alert / Action (Only for PPPoE with existing plan) */}
             {needsRenewal && hasPlan && (
