@@ -1081,7 +1081,7 @@ export default function PelangganDashboard() {
           style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: activeTab === 'wallet' ? '#16a34a' : '#94a3b8', cursor: 'pointer' }}
         >
           <Wallet size={activeTab === 'wallet' ? 24 : 22} strokeWidth={activeTab === 'wallet' ? 2.5 : 2} />
-          <span style={{ fontSize: '11px', fontWeight: activeTab === 'wallet' ? 800 : 500 }}>Saldo</span>
+          <span style={{ fontSize: '11px', fontWeight: activeTab === 'wallet' ? 800 : 500 }}>Wallet</span>
         </button>
         <button
           onClick={() => setActiveTab('history')}
@@ -1089,6 +1089,13 @@ export default function PelangganDashboard() {
         >
           <History size={activeTab === 'history' ? 24 : 22} strokeWidth={activeTab === 'history' ? 2.5 : 2} />
           <span style={{ fontSize: '11px', fontWeight: activeTab === 'history' ? 800 : 500 }}>Belian</span>
+        </button>
+        <button
+          onClick={() => window.location.href = '/beli'}
+          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: '#94a3b8', cursor: 'pointer' }}
+        >
+          <Tag size={22} strokeWidth={2} />
+          <span style={{ fontSize: '11px', fontWeight: 500 }}>Baucar</span>
         </button>
       </div>
     </div>

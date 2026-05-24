@@ -425,7 +425,7 @@ export default function BeliVoucher() {
           style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: '#16a34a', cursor: 'pointer' }}
         >
           <Tag size={24} strokeWidth={2.5} />
-          <span style={{ fontSize: '11px', fontWeight: 800 }}>Voucher</span>
+          <span style={{ fontSize: '11px', fontWeight: 800 }}>Baucar</span>
         </button>
       </div>
 
