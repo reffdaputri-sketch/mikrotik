@@ -29,6 +29,17 @@ export default function PelangganDashboard() {
   const [otpSent, setOtpSent] = useState(false)
   const [loginInfo, setLoginInfo] = useState('')
   const [maskedPhone, setMaskedPhone] = useState('')
+  const [otpTimer, setOtpTimer] = useState(0)
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+    if (otpTimer > 0) {
+      interval = setInterval(() => {
+        setOtpTimer((prev) => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(interval)
+  }, [otpTimer])
 
   // Cek session dan fetch data terbaru
   useEffect(() => {
@@ -90,6 +101,7 @@ export default function PelangganDashboard() {
       if (!res.ok) throw new Error(data.error || 'Gagal menghantar OTP')
       setOtpSent(true)
       setMaskedPhone(data.masked_phone || '')
+      setOtpTimer(10)
       setLoginInfo(data.message || 'Kod OTP telah dihantar ke WhatsApp anda')
     } catch (err: any) {
       setError(err.message)
@@ -338,6 +350,22 @@ export default function PelangganDashboard() {
               >
                 {loading ? 'Mengesahkan...' : '✅ Masuk ke Dashboard'}
               </button>
+
+              <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                {otpTimer > 0 ? (
+                  <p style={{ fontSize: '13px', color: '#6b7280' }}>
+                    Sila tunggu <strong style={{ color: '#ea580c' }}>{otpTimer}s</strong> untuk kirim semula OTP
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => handleSendLoginOtp(e)}
+                    style={{ background: 'none', border: 'none', color: '#16a34a', fontWeight: 700, fontSize: '14px', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    Kirim Semula OTP
+                  </button>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => { setOtpSent(false); setLoginOtp(''); setError(''); setLoginInfo(''); setMaskedPhone('') }}

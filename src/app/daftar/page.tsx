@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Wifi, User, Phone, Lock, MessageSquare, Eye, EyeOff, CheckCircle, AlertCircle, AtSign } from 'lucide-react'
 
@@ -20,6 +20,17 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
+  const [otpTimer, setOtpTimer] = useState(0)
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+    if (otpTimer > 0) {
+      interval = setInterval(() => {
+        setOtpTimer((prev) => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(interval)
+  }, [otpTimer])
 
   // ─── Step 1: Kirim OTP ──────────────────────────────────────────
   async function handleSendOTP(e: React.FormEvent) {
@@ -44,6 +55,7 @@ export default function RegisterPage() {
       if (!res.ok) throw new Error(data.error || 'Gagal menghantar OTP')
 
       setInfo(`OTP telah dihantar ke WhatsApp ${phone}. Sila semak mesej anda.`)
+      setOtpTimer(10)
       setStep('otp')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Terjadi ralat')
@@ -204,6 +216,22 @@ export default function RegisterPage() {
               <button type="submit" id="reg-verify" className="btn btn-primary" style={{ width: '100%', padding: '12px', marginBottom: '12px' }} disabled={loading}>
                 {loading ? <><span className="spinner" />Mendaftar...</> : '✅ Sahkan & Daftar'}
               </button>
+
+              <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                {otpTimer > 0 ? (
+                  <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                    Sila tunggu <strong style={{ color: '#3b82f6' }}>{otpTimer}s</strong> untuk kirim semula OTP
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => handleSendOTP(e)}
+                    style={{ background: 'none', border: 'none', color: '#4ade80', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    Kirim Semula OTP
+                  </button>
+                )}
+              </div>
 
               <button type="button" onClick={() => { setStep('form'); setError(''); setInfo('') }} style={{ width: '100%', padding: '10px', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#64748b', cursor: 'pointer', fontSize: '0.875rem' }}>
                 ← Kembali & tukar nombor
