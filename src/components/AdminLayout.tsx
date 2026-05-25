@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   LayoutDashboard, Users, Package, Router, Receipt,
   Ticket, Settings, LogOut, Menu, X, Wifi,
-  ChevronRight, Bell, User, Activity, MapPin, Image
+  ChevronRight, Bell, User, Activity, MapPin, Image, MessageSquare
 } from 'lucide-react'
 
 const navItems = [
@@ -18,6 +18,7 @@ const navItems = [
   { href: '/admin/invoices', label: 'Invois & Bil', icon: Receipt },
   { href: '/admin/transactions', label: 'Sejarah Transaksi', icon: Activity },
   { href: '/admin/vouchers', label: 'Voucher', icon: Ticket },
+  { href: '/admin/complaints', label: 'Laporan Gangguan', icon: MessageSquare },
   { href: '/admin/maps', label: 'Geo-Maps', icon: MapPin },
   { section: 'Jaringan' },
   { href: '/admin/routers', label: 'Router MikroTik', icon: Router },
