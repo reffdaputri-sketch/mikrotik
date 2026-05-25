@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const supabase = await createAdminClient()
   let query = supabase
     .from('vouchers')
-    .select('*, plans(name_plan), routers(name)')
+    .select('*, plans(name_plan, price), routers(name)')
     .order('created_at', { ascending: false })
   
   if (status) {
