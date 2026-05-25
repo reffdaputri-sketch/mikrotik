@@ -81,9 +81,9 @@ export default function ComplaintsPage() {
         </button>
       </div>
 
-      <div className="card">
-        <div className="table-responsive">
-          <table className="table">
+      <div className="glass-card">
+        <div className="table-wrapper">
+          <table className="data-table">
             <thead>
               <tr>
                 <th>Pelanggan</th>
@@ -97,13 +97,13 @@ export default function ComplaintsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '30px' }}>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>
                     <RefreshCw className="animate-spin" style={{ margin: '0 auto', color: '#94a3b8' }} />
                   </td>
                 </tr>
               ) : complaints.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#475569' }}>
                     Tiada laporan ditemui.
                   </td>
                 </tr>
@@ -111,24 +111,24 @@ export default function ComplaintsPage() {
                 complaints.map(c => (
                   <tr key={c.id}>
                     <td>
-                      <div style={{ fontWeight: 600 }}>{c.customers?.fullname || 'Unknown'}</div>
-                      <div style={{ fontSize: '12px', color: '#64748b' }}>@{c.customers?.username}</div>
+                      <div style={{ fontWeight: 600, color: '#f1f5f9' }}>{c.customers?.fullname || 'Unknown'}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>@{c.customers?.username}</div>
                     </td>
-                    <td style={{ fontWeight: 600 }}>{c.subject}</td>
-                    <td style={{ maxWidth: '250px', whiteSpace: 'normal', fontSize: '13px' }}>
+                    <td style={{ fontWeight: 600, color: '#f1f5f9' }}>{c.subject}</td>
+                    <td style={{ maxWidth: '250px', whiteSpace: 'normal', fontSize: '0.875rem', color: '#cbd5e1' }}>
                       {c.description}
                     </td>
-                    <td style={{ fontSize: '13px', color: '#64748b' }}>
+                    <td style={{ fontSize: '0.75rem', color: '#64748b' }}>
                       {new Date(c.created_at).toLocaleString()}
                     </td>
                     <td>{getStatusBadge(c.status)}</td>
                     <td style={{ textAlign: 'right' }}>
-                      <div style={{ display: 'flex', gap: '5px', justifyContent: 'flex-end' }}>
+                      <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
                         {c.status !== 'resolved' && c.status !== 'selesai' && (
                           <button
                             onClick={() => updateStatus(c.id, 'resolved')}
                             className="btn btn-sm"
-                            style={{ background: '#dcfce7', color: '#16a34a', border: 'none' }}
+                            style={{ background: 'rgba(22, 163, 74, 0.2)', color: '#4ade80', border: '1px solid rgba(22, 163, 74, 0.3)' }}
                             title="Tandakan Selesai"
                           >
                             <CheckCircle size={14} />
@@ -138,7 +138,7 @@ export default function ComplaintsPage() {
                           <button
                             onClick={() => updateStatus(c.id, 'in-progress')}
                             className="btn btn-sm"
-                            style={{ background: '#e0f2fe', color: '#0284c7', border: 'none' }}
+                            style={{ background: 'rgba(2, 132, 199, 0.2)', color: '#38bdf8', border: '1px solid rgba(2, 132, 199, 0.3)' }}
                             title="Tandakan Sedang Diproses"
                           >
                             <Clock size={14} />
@@ -146,11 +146,11 @@ export default function ComplaintsPage() {
                         )}
                         <button
                           onClick={() => deleteComplaint(c.id)}
-                          className="btn btn-sm"
-                          style={{ background: '#fee2e2', color: '#ef4444', border: 'none' }}
+                          className="btn btn-danger btn-sm"
+                          style={{ padding: '5px 8px' }}
                           title="Padam"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={13} />
                         </button>
                       </div>
                     </td>
