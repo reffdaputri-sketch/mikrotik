@@ -73,7 +73,7 @@ export default function ComplaintsPage() {
   }
 
   return (
-    <div className="page-container">
+    <div className="page-content">
       <div className="page-header">
         <h1 className="page-title"><MessageSquare size={24} style={{ marginRight: '10px' }} /> Laporan Gangguan</h1>
         <button onClick={fetchComplaints} className="btn btn-secondary btn-sm" disabled={loading}>
