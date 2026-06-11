@@ -462,7 +462,7 @@ export default function PelangganDashboard() {
             onClick={() => setActiveTab('wallet')}
             style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: activeTab === 'wallet' ? '#16a34a' : 'transparent', color: activeTab === 'wallet' ? 'white' : '#64748b', fontWeight: 800, fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s' }}
           >
-            SALDO
+            BAKI
           </button>
           <button
             onClick={() => setActiveTab('history')}
@@ -623,7 +623,7 @@ export default function PelangganDashboard() {
                     border: '1px solid #e2e8f0', display: 'grid', gap: '10px'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Pakej Pembaharuan</span>
+                      <span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Pakej Langganan</span>
                       <span style={{ fontSize: '14px', color: '#1e293b', fontWeight: 700 }}>{customer?.plans?.name_plan || 'Pilih Paket Baru'}</span>
                     </div>
                     <div style={{ height: '1px', background: '#e2e8f0' }}></div>
@@ -703,7 +703,7 @@ export default function PelangganDashboard() {
             }}>
               <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#111827' }}>
                 <div style={{ padding: '8px', background: '#f0fdf4', borderRadius: '8px' }}><Clock size={18} color="#16a34a" /></div>
-                Sejarah Pembayaran
+                Senarai Pembayaran
               </h3>
               <div style={{ display: 'grid', gap: '12px' }}>
                 {customer.payment_orders && customer.payment_orders.length > 0 ? (
@@ -750,7 +750,7 @@ export default function PelangganDashboard() {
 
         {activeTab === 'wallet' && (
           <div style={{ background: 'white', padding: '28px', borderRadius: '24px', border: '1px solid #dcfce7', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#166534', marginBottom: '20px' }}>Sejarah Prmbelian</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 900, color: '#166534', marginBottom: '20px' }}>Senarai Pembelian</h3>
             <div style={{ display: 'grid', gap: '12px' }}>
               {balanceLogs.length > 0 ? balanceLogs.map((log: any) => (
                 <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: '#f9fafb', borderRadius: '16px', border: '1px solid #f3f4f6' }}>
@@ -768,7 +768,7 @@ export default function PelangganDashboard() {
                   </div>
                 </div>
               )) : (
-                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>Belum ada Sejarah pembelian.</div>
+                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>Belum ada senarai pembelian.</div>
               )}
             </div>
           </div>
@@ -799,7 +799,7 @@ export default function PelangganDashboard() {
                   </div>
                 </div>
               )) : (
-                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>Belum ada riwayat pembelian.</div>
+                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>Belum ada senarai pembelian.</div>
               )}
             </div>
           </div>
@@ -841,7 +841,7 @@ export default function PelangganDashboard() {
                   boxShadow: topupTab === 'otomatis' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
                 }}
               >
-                OTOMATIS
+                AUTOMATIK
               </button>
               <button
                 onClick={() => setTopupTab('manual')}
@@ -859,7 +859,7 @@ export default function PelangganDashboard() {
 
             {topupTab === 'otomatis' ? (
               <>
-                <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>Wallet akan bertambah otomatis setelah pembayaran berhasil.</p>
+                <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>Wallet akan bertambah automatik setelah pembayaran berhasil.</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '20px' }}>
                   {['10', '20', '50', '100', '200', '500'].map(amt => (
                     <button
@@ -880,7 +880,7 @@ export default function PelangganDashboard() {
 
                 <form onSubmit={handleTopup}>
                   <div style={{ marginBottom: '24px' }}>
-                    <label className="form-label" style={{ fontWeight: 700, fontSize: '14px' }}>Jumlah Kustom (RM)</label>
+                    <label className="form-label" style={{ fontWeight: 700, fontSize: '14px' }}>Jumlah (RM)</label>
                     <input
                       type="number"
                       className="form-input"
