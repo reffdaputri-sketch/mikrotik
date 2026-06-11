@@ -62,8 +62,8 @@ export async function POST(
       }
     }
 
-    // 4. JIKA INI TOP UP SALDO WALLET (Cek berdasarkan nama plan)
-    if (order.plan_name === 'Top Up Saldo Wallet') {
+    // 4. JIKA INI TOP UP WALLET (Cek berdasarkan nama plan)
+    if (order.plan_name === 'Top Up Saldo Wallet' || order.plan_name === 'Top Up Wallet') {
       // Cari pelanggan berdasarkan customer_id yang tersimpan di order
       const { data: customer } = await supabase.from('customers').select('*').eq('id', order.customer_id).single()
       

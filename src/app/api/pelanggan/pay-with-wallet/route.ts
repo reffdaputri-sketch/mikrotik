@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     // 2. Semak baki saldo
     if (customer.balance < price) {
-      return NextResponse.json({ error: 'Baki saldo tidak mencukupi' }, { status: 400 })
+      return NextResponse.json({ error: 'Baki wallet tidak mencukupi' }, { status: 400 })
     }
 
     // 3. Mulakan Transaksi (Update Balance & Renew Expiry)

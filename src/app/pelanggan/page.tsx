@@ -722,7 +722,7 @@ export default function PelangganDashboard() {
                             <Receipt size={18} color={order.status === 'paid' ? '#16a34a' : '#d97706'} />
                           </div>
                           <div>
-                            <div style={{ fontSize: '15px', fontWeight: 700, color: '#1f2937' }}>{order.plan_name || 'Pakej Internet'}</div>
+                            <div style={{ fontSize: '15px', fontWeight: 700, color: '#1f2937' }}>{order.plan_name?.replace('Saldo ', '') || 'Pakej Internet'}</div>
                             <div style={{ fontSize: '12px', color: '#6b7280' }}>{new Date(order.created_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
                           </div>
                         </div>
@@ -789,7 +789,7 @@ export default function PelangganDashboard() {
                       <Receipt size={18} color={order.status === 'paid' ? '#16a34a' : '#d97706'} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#1f2937' }}>{order.plan_name}</div>
+                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#1f2937' }}>{order.plan_name?.replace('Saldo ', '')}</div>
                       <div style={{ fontSize: '12px', color: '#6b7280' }}>{new Date(order.created_at).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
                     </div>
                   </div>

@@ -125,7 +125,7 @@ export default function CustomersPage() {
     })
 
     if (res.ok) {
-      alert(`Berhasil menambah saldo RM ${topupAmount} untuk ${selectedCustomerForTopup.fullname}`)
+      alert(`Berhasil menambah RM ${topupAmount} untuk ${selectedCustomerForTopup.fullname}`)
       setShowTopupModal(false)
       setTopupAmount('')
       fetchCustomers()
@@ -247,7 +247,7 @@ export default function CustomersPage() {
                       <button onClick={() => handleRenew(c)} title="Lanjutkan 1 Bulan" className="btn btn-primary btn-sm" style={{ padding: '5px 8px', background: '#16a34a' }}>
                         <RefreshCw size={13} />
                       </button>
-                       <button onClick={() => { setSelectedCustomerForTopup(c); setShowTopupModal(true); }} title="Isi Saldo Cash" className="btn btn-secondary btn-sm" style={{ padding: '5px 8px', background: '#fbbf24', borderColor: '#fbbf24' }}>
+                       <button onClick={() => { setSelectedCustomerForTopup(c); setShowTopupModal(true); }} title="Isi Cash" className="btn btn-secondary btn-sm" style={{ padding: '5px 8px', background: '#fbbf24', borderColor: '#fbbf24' }}>
                         <Wallet size={13} color="white" />
                       </button>
                       <button onClick={() => openEdit(c)} className="btn btn-secondary btn-sm" style={{ padding: '5px 8px' }}><Edit2 size={13} /></button>
@@ -384,7 +384,7 @@ export default function CustomersPage() {
         <div className="modal-overlay" onClick={() => setShowTopupModal(false)}>
           <div className="modal-box" style={{ maxWidth: '400px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Top Up Saldo Cash</h3>
+              <h3 style={{ fontWeight: 700, color: '#f1f5f9' }}>Top Up Cash</h3>
               <button onClick={() => setShowTopupModal(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.2rem' }}>×</button>
             </div>
             <form onSubmit={handleCashTopup}>
@@ -408,7 +408,7 @@ export default function CustomersPage() {
               <div className="modal-footer">
                 <button type="button" onClick={() => setShowTopupModal(false)} className="btn btn-secondary">Batal</button>
                 <button type="submit" className="btn btn-primary" style={{ background: '#10b981', borderColor: '#10b981' }} disabled={topupLoading}>
-                  {topupLoading ? 'Memproses...' : 'ISI SALDO SEKARANG'}
+                  {topupLoading ? 'Memproses...' : 'ISI CASH SEKARANG'}
                 </button>
               </div>
             </form>

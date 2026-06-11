@@ -62,7 +62,7 @@ export default function BeliVoucher() {
     if (!selectedPlan) return
     
     if (method === 'wallet' && !isLoggedIn) {
-      alert('Sila Login ke akaun pelanggan anda dahulu untuk menggunakan baki saldo!')
+      alert('Sila Login ke akaun pelanggan anda dahulu untuk menggunakan baki wallet!')
       window.location.href = '/pelanggan'
       return
     }

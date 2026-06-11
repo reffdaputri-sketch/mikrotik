@@ -51,8 +51,8 @@ export async function POST(request: Request) {
 
     // --- LOGIK PEMBAYARAN MENGIKUT JENIS ---
     
-    // 1. Jika JENIS TOP UP SALDO
-    if (order.plan_name === 'Top Up Saldo Wallet') {
+    // 1. Jika JENIS TOP UP SALDO ATAU TOP UP WALLET
+    if (order.plan_name === 'Top Up Saldo Wallet' || order.plan_name === 'Top Up Wallet') {
       const { data: customer } = await supabase.from('customers').select('id, balance').eq('username', order.username).single()
       if (customer) {
         const newBalance = Number(customer.balance) + Number(order.price)

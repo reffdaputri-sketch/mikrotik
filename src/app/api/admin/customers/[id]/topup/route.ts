@@ -51,7 +51,7 @@ export async function POST(
       order_id: `CASH-${Math.random().toString(36).slice(2, 10).toUpperCase()}`,
       customer_id: id,
       customer_name: customer.fullname,
-      plan_name: 'Top Up Saldo Cash',
+      plan_name: 'Top Up Cash',
       price: amount,
       status: 'paid',
       paid_at: new Date().toISOString(),

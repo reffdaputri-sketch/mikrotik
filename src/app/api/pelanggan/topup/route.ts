@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       order_id,
       customer_id: customer.id,
       customer_name: customer.fullname,
-      plan_name: 'Top Up Saldo Wallet', // Wajib ada!
+      plan_name: 'Top Up Wallet', // Wajib ada!
       price: parseFloat(amount),
       status: 'pending'
     }

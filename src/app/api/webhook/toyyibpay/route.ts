@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     // --- LOGIKA TOP-UP WALLET ---
-    if (order.plan_name === 'Top Up Saldo Wallet' || order.order_id.startsWith('TOPUP-') || order.order_id.startsWith('TRF-')) {
+    if (order.plan_name === 'Top Up Saldo Wallet' || order.plan_name === 'Top Up Wallet' || order.order_id.startsWith('TOPUP-') || order.order_id.startsWith('TRF-')) {
       // 1. Update order status
       await supabase
         .from('payment_orders')
