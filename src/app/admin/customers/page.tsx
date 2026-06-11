@@ -125,7 +125,7 @@ export default function CustomersPage() {
     })
 
     if (res.ok) {
-      alert(`Berhasil menambah RM ${topupAmount} untuk ${selectedCustomerForTopup.fullname}`)
+      alert(`Berjaya menambah RM ${topupAmount} untuk ${selectedCustomerForTopup.fullname}`)
       setShowTopupModal(false)
       setTopupAmount('')
       fetchCustomers()

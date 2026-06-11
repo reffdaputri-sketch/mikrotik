@@ -87,9 +87,6 @@ export async function GET(request: Request) {
         const planName = customer.plans?.name_plan || 'Pakej Internet'
         const price = customer.plans?.price || 0
 
-        // Custom scheme — terus buka app Purnama WiFi tanpa browser
-        const appLink = `purnamawifi://pelanggan`
-
         const message = 
           `⚠️ *NOTIFIKASI TAMAT TEMPOH (PURNAMA WIFI)* ⚠️\n\n` +
           `Salam sejahtera *${customer.fullname}*,\n\n` +
@@ -98,9 +95,7 @@ export async function GET(request: Request) {
           `Jumlah Bayaran: *RM ${price}*\n\n` +
           `━━━━━━━━━━━━━━━\n` +
           `📲 *BUAT BAYARAN SEKARANG:*\n\n` +
-          `Klik pautan di bawah untuk buka aplikasi:\n` +
-          `👉 ${appLink}\n\n` +
-          `_(Pastikan aplikasi Purnama WiFi sudah dipasang)_\n\n` +
+          `Sila buka aplikasi Purnama WiFi anda untuk membuat semakan dan pembayaran.\n\n` +
           `━━━━━━━━━━━━━━━\n` +
           `Terima kasih kerana memilih Purnama WiFi! 🙏`
 

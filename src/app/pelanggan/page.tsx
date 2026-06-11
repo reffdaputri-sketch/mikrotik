@@ -212,7 +212,7 @@ export default function PelangganDashboard() {
 
     const data = await res.json()
     if (res.ok) {
-      alert('Bukti transfer berhasil diunggah! Admin akan segera memverifikasi.')
+      alert('Bukti transfer berjaya dimuat naik! Admin akan segera mengesahkan.')
       setShowTopupModal(false)
       setManualOrderId('')
       setProofFile(null)
@@ -859,7 +859,7 @@ export default function PelangganDashboard() {
 
             {topupTab === 'otomatis' ? (
               <>
-                <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>Wallet akan bertambah automatik setelah pembayaran berhasil.</p>
+                <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>Wallet akan bertambah automatik setelah pembayaran berjaya.</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '20px' }}>
                   {['10', '20', '50', '100', '200', '500'].map(amt => (
                     <button
@@ -928,7 +928,7 @@ export default function PelangganDashboard() {
                         fontWeight: 800, cursor: 'pointer', boxShadow: '0 10px 15px -3px rgba(22, 163, 74, 0.3)'
                       }}
                     >
-                      {topupLoading ? 'Memproses...' : 'KONFIRMASI JUMLAH'}
+                      {topupLoading ? 'Memproses...' : 'SAHKAN JUMLAH'}
                     </button>
                   </form>
                 ) : (
@@ -950,7 +950,7 @@ export default function PelangganDashboard() {
 
                     <button
                       onClick={() => {
-                        const msg = `Halo Admin, saya ingin Konfirmasi Top Up Manual.\n\n*Butiran:*\nNo. Invoice: #${manualOrderId}\nNama: ${customer.fullname}\nUsername: ${customer.username}\nJumlah: RM ${topupAmount}\n\n_Mohon setujui top up saya setelah cek mutasi. Terima kasih._`;
+                        const msg = `Halo Admin, saya ingin Sahkan Top Up Manual.\n\n*Butiran:*\nNo. Invoice: #${manualOrderId}\nNama: ${customer.fullname}\nUsername: ${customer.username}\nJumlah: RM ${topupAmount}\n\n_Mohon setujui top up saya setelah cek mutasi. Terima kasih._`;
                         window.open(`https://wa.me/60104005969?text=${encodeURIComponent(msg)}`, '_blank');
                       }}
                       style={{
@@ -962,7 +962,7 @@ export default function PelangganDashboard() {
                         marginBottom: '16px'
                       }}
                     >
-                      🚀 KONFIRMASI WHATSAPP
+                      🚀 SAHKAN DI WHATSAPP
                     </button>
 
                     <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '20px', marginTop: '10px' }}>
