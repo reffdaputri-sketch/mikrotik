@@ -53,16 +53,20 @@ export default function SettingsPage() {
       const data = await res.json()
       setWaStatus(data)
 
-      if (!data.connected && data.hasQR) {
-        // Ambil QR code melalui proxy
+      if (!data.connected) {
+        // Cuba sentiasa ambil QR code melalui proxy jika belum tersambung
         const qrRes = await fetch('/api/admin/whatsapp?action=qr')
         if (qrRes.ok) {
           const qrData = await qrRes.json()
-          if (qrData.qr) setWaQR(qrData.qr)
+          if (qrData.qr) {
+            setWaQR(qrData.qr)
+          } else {
+            setWaQR(null)
+          }
         }
-        // Mula polling setiap 3 saat
+        // Mula polling setiap 3 saat jika belum tersambung
         startPolling()
-      } else if (data.connected) {
+      } else {
         setWaQR(null)
         stopPolling()
       }
