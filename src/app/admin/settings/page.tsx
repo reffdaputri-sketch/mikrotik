@@ -161,7 +161,7 @@ export default function SettingsPage() {
                 {/* Info panduan */}
                 <div style={{ background: 'rgba(59,130,246,0.05)', border: '1px solid rgba(59,130,246,0.15)', borderRadius: '10px', padding: '14px', fontSize: '0.78rem', color: '#64748b', lineHeight: 1.7 }}>
                   <strong style={{ color: '#93c5fd' }}>📋 Cara Sambung:</strong><br/>
-                  1. Pastikan wa-agent berjalan di <code style={{ color: '#f1f5f9', background: 'rgba(255,255,255,0.05)', padding: '1px 4px', borderRadius: '3px' }}>https://wa.baharimedika.com</code><br/>
+                  1. Pastikan wa-agent berjalan di <code style={{ color: '#f1f5f9', background: 'rgba(255,255,255,0.05)', padding: '1px 4px', borderRadius: '3px' }}>{config.whatsapp_gateway_url || 'https://server.internetdesa.site'}</code><br/>
                   2. Klik <strong style={{ color: '#f1f5f9' }}>Refresh Status</strong> hingga QR muncul<br/>
                   3. Imbas QR dengan WhatsApp anda<br/>
                   4. Status akan bertukar menjadi <span style={{ color: '#22c55e' }}>Tersambung</span>
@@ -212,6 +212,34 @@ export default function SettingsPage() {
                     </button>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* WhatsApp Gateway Settings */}
+            <div style={{ marginTop: '24px', borderTop: '1px solid #1e293b', paddingTop: '20px' }}>
+              <h4 style={{ fontWeight: 600, color: '#f1f5f9', marginBottom: '12px', fontSize: '0.9rem' }}>Konfigurasi WhatsApp Gateway</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+                <div>
+                  <label className="form-label" style={{ color: '#94a3b8' }}>URL WhatsApp Gateway</label>
+                  <input
+                    className="form-input"
+                    placeholder="https://server.internetdesa.site/"
+                    value={config.whatsapp_gateway_url || ''}
+                    onChange={e => setConfig({...config, whatsapp_gateway_url: e.target.value})}
+                  />
+                  <p style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '4px' }}>Contoh: https://server.internetdesa.site/ (biarkan kosong untuk menggunakan default)</p>
+                </div>
+                <div>
+                  <label className="form-label" style={{ color: '#94a3b8' }}>WhatsApp API Key / Token</label>
+                  <input
+                    className="form-input"
+                    type="password"
+                    placeholder="purnamawifi_wa_secure_key_..."
+                    value={config.whatsapp_api_key || ''}
+                    onChange={e => setConfig({...config, whatsapp_api_key: e.target.value})}
+                  />
+                  <p style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '4px' }}>Token keamanan otentikasi dengan WhatsApp Agent.</p>
+                </div>
               </div>
             </div>
           </div>
